@@ -1,0 +1,10 @@
+<h2>Search authors</h2>
+<label>Name</label>
+<form action='/authors' method='GET'>
+    <input type='text' name='name'>
+    <button type='submit'>Search</button>
+</form>
+<br>
+<% authors.forEach(author => { %>
+    <div>Author_id = <%=author.AuthorID%>; name = <%= author.name %></div>
+<% }); %>
