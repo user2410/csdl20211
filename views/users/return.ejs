@@ -1,0 +1,42 @@
+<% let ids = []%>
+<table>
+    <thead>
+        <tr>
+            <td>Cover</td>
+            <td>Title</td>
+            <td>Loan Date</td>
+            <td>Return Date</td>
+            <td>Return</td>
+        </tr>
+    </thead>
+    <tbody>
+        <% borrowed.forEach(b => { %>
+            <tr id="r<%=b.bookID%>">
+                <%ids.push(b.bookID)%>
+                <td><img src="<%=b.coverImage%>" alt="<%=b.title%>"></td>
+                <td><a href="books/book?id=<%=b.bookID%>"><%=b.title%></a></td>
+                <td><%=b.loanDate.toISOString().split('T')[0]%></td>
+                <td><%=b.returnDate.toISOString().split('T')[0]%></td>
+                <td><button type="button" id="<%=b.bookID%>">Return</button></td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+<%ids = JSON.stringify(ids);%>
+<script>
+    var ids = JSON.parse('<%-ids%>');
+    var buttons = [];
+    ids.forEach(id => {
+        const btn = document.getElementById(`${id}`);
+        btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open('GET', `/users/return?bookID=${id}`)
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(`r${id}`).remove()}
+            }
+            req.send();
+        })
+    });
+</script>

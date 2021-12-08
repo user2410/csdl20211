@@ -1,0 +1,52 @@
+<table>
+    <thead>
+        <tr>
+            <td>Name</td>
+            <td>Profile Image</td>
+            <td>Biography</td>
+            <td>Accept/Decline</td>
+        </tr>
+    </thead>
+    <tbody>
+        <% authors.forEach(author => { %>
+            <tr id="a<%=author.id%>">
+                <td><%=author.aname%></td>
+                <td><img src="<%-author.aImage%>"></td>
+                <td><%=author.adesc%></td>
+                <td>
+                    <button id="acc-btn<%=author.id%>" value="a<%=author.id%>">Accept</button>
+                    <button id="dec-btn<%=author.id%>" value="a<%=author.id%>">Decline</button>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+<% ids = []; books.forEach(book => ids.push(book.id)); ids = JSON.stringify(ids);%>
+<script>
+    var ids = JSON.parse(`<%-ids%>`);
+    ids.forEach(id => {
+        const acc_btn = document.getElementById(`acc-btn${id}`);
+        acc_btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open("GET", `/users/accept?id=${acc_btn.value}`);
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(acc_btn.value).remove()}
+            }
+            req.send();
+        })
+
+        const dec_btn = document.getElementById(`dec-btn${id}`);
+        dec_btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open("DELETE", `/users/accept?id=${acc_btn.value}`);
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(dec_btn.value).remove()}
+            }
+            req.send();
+        })
+    })
+</script>

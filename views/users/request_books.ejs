@@ -1,0 +1,66 @@
+<% let ids = [];%>
+<table>
+    <thead>
+        <tr>
+            <td>Cover</td>
+            <td>Title</td>
+            <td>Author</td>
+            <td>Category</td>
+            <td>Publish Date</td>
+            <td>Description</td>
+            <td>Accept/Decline</td>
+        </tr>
+    </thead>
+    <tbody>
+        <% books.forEach(book => { %>
+            <tr id="b<%=book.id%>">
+                <% ids.push(book.id) %>
+                <td><img src="<%-book.coverImage%>" height="150" width="100"></td>
+                <td><%=book.title%></td>
+                <td><%book.authors.forEach(author => {%>
+                    <%=author.aname%>,&nbsp;
+                <%})%></td>
+                <td><% book.cats.forEach(cat => { %>
+                    <a href="/books/cat?id=<%=cat.catID%>"><%=cat.name%></a>,&nbsp;
+                <% }) %></td>
+                <td><%=book.pbDate.toISOString().split('T')[0]%></td>
+                <td><%=book.bdesc%></td>
+                <td>
+                    <button id="acc-btn<%=book.id%>" value="b<%=book.id%>">Accept</button>
+                    <button id="dec-btn<%=book.id%>" value="b<%=book.id%>">Decline</button>
+                </td>
+            </tr>
+        <% })%>
+    </tbody>
+</table>
+
+<% ids = JSON.stringify(ids)%>
+
+<script>
+    var ids = JSON.parse(`<%-ids%>`);
+    ids.forEach(id => {
+        const acc_btn = document.getElementById(`acc-btn${id}`);
+        acc_btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open("GET", `/users/accept?id=${acc_btn.value}`);
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(acc_btn.value).remove()}
+            }
+            req.send();
+        })
+
+        const dec_btn = document.getElementById(`dec-btn${id}`);
+        dec_btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open("DELETE", `/users/accept?id=${acc_btn.value}`);
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(dec_btn.value).remove()}
+            }
+            req.send();
+        })
+    })
+</script>

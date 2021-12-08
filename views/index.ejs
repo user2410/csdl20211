@@ -1,1 +1,51 @@
-Middle
+<%- include('books/search_form.ejs') %>
+<% let i=0;%>
+<h2>Most voted books</h2>
+<table>
+    <tbody>
+        <tr>
+        <%votes.forEach(b=>{%>
+            <%if(i++ == 3){%></tr><tr><%}%>
+            <td>
+                <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
+                <h3><%=b.title%></h3>
+                <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
+            </td>
+        <% }) %>
+        </tr>
+    </tbody>
+</table>
+
+<%i=0;%>
+<h2>Most viewed books</h2>
+<table>
+    <tbody>
+        <tr>
+        <%views.forEach(b=>{%>
+            <%if(i++ == 3){%></tr><tr><%}%>
+            <td>
+                <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
+                <h3><%=b.title%></h3>
+                <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
+            </td>
+        <% }) %>
+        </tr>
+    </tbody>
+</table>
+
+<%i=0;%>
+<h2>New books</h2>
+<table>
+    <tbody>
+        <tr>
+        <%news.forEach(b=>{%>
+            <%if(i++ == 3){%></tr><tr><%}%>
+            <td>
+                <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
+                <h3><%=b.title%></h3>
+                <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
+            </td>
+        <% }) %>
+        </tr>
+    </tbody>
+</table>

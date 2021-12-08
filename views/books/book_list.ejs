@@ -1,0 +1,20 @@
+<table>
+    <thead>
+        <tr>
+            <td>Cover</td>
+            <td>Title</td>
+            <td>Author</td>
+            <td>Category</td>
+        </tr>
+    </thead>
+    <tbody>
+        <% books.forEach(book => { %>
+            <tr>
+                <td><img src="<%=book.coverImage%>" alt="book.title" height="150" width="100"></td>
+                <td><a href="/books/book?id=<%=book.bookID%>"><%=book.title%></a></td>
+                <td><a href="/authors/author?id=<%=book.authorID%>"><%=book.aname%></a></td>
+                <td><a href="/books/cats?id=<%=book.catID%>"><%=book.catname%></a></td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>

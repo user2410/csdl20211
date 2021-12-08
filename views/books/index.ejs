@@ -1,0 +1,6 @@
+<%-include('search_form.ejs')%>
+<%if(books.length > 0){%>
+    <%-include('book_list.ejs')%>
+<%}else{%>
+    <h2>No such book matches your criteria</h2>
+<%}%>
