@@ -1,7 +1,8 @@
+<h2>Seach for books ...</h2>
 <form action="/books" method="GET">
     <div>
         <label for="title">Title</label>
-        <input type="text" name="title" id="title" maxlength="30">
+        <input type="text" name="title" id="title" maxlength="30" required>
         <label for="aname">Author</label>
         <input type="text" name="aname" id="aname" maxlength="30">
         <label for="cat">Category</label>
@@ -16,14 +17,14 @@
     <div>
         <label for="orderBy">Order by</label>
         <select name="orderBy" id="orderBy">
+            <option value="votes">Votes</option>
             <option value="title">Title</option>
             <option value="views">Views</option>
-            <option value="votes">Votes</option>
         </select>
         <label for="order">In order</label>
         <select name="order">
-            <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
+            <option value="asc">Ascending</option>
         </select>
     </div>
     <button type="submit">Find</button>

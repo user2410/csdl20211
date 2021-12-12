@@ -3,7 +3,27 @@
         <a href='/'>My library</a>
         <ul>
             <li><a href="/authors">Authors</a></li>
-            <li><a href="/authors/new">Add Authors</a></li>
+            <li><a href="/books/cats">Categories</a></li>
+            <%if(user){%>
+            <li>Hello <a href="/users/" id="user_prof"><%=user.name%></a></li>
+            <%switch (user.role) {
+                case 'member': %>
+                    <li><a href="/books/new">Add a new book</a></li>
+                    <li><a href="/users/borrow">Borrowed books</a></li>
+                    <% break;
+                case 'staff': %>
+                    <li><a href="/users/requests/books">Books requests</a></li>
+                    <li><a href="/users/requests/authors">Authors requests</a></li>
+                    <% break;
+                case 'admin': %>
+                    <li><a href="/users/manage">Manage</a></li>
+                    <% break; 
+            } %>
+            <li><form action="/logout?_method=DELETE" method="POST"><button type="submit" id="btn_logout">Logout</button></form></li>
+            <% }else{ %>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+            <%}%>
         </ul>
     </nav>
 </header>

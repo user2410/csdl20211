@@ -28,7 +28,7 @@
         const acc_btn = document.getElementById(`acc-btn${id}`);
         acc_btn.addEventListener('click', ()=>{
             let req = new XMLHttpRequest();
-            req.open("GET", `/users/accept?id=${acc_btn.value}`);
+            req.open("PUT", `/users/accept/${acc_btn.value}`);
             req.onload = function(){
                 let response = JSON.parse(req.responseText);
                 alert(response.message);
@@ -40,7 +40,7 @@
         const dec_btn = document.getElementById(`dec-btn${id}`);
         dec_btn.addEventListener('click', ()=>{
             let req = new XMLHttpRequest();
-            req.open("DELETE", `/users/accept?id=${acc_btn.value}`);
+            req.open("DELETE", `/users/accept/id=${acc_btn.value}`);
             req.onload = function(){
                 let response = JSON.parse(req.responseText);
                 alert(response.message);

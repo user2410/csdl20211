@@ -1,10 +1,29 @@
-<h2>Search authors</h2>
-<label>Name</label>
-<form action='/authors' method='GET'>
-    <input type='text' name='name'>
-    <button type='submit'>Search</button>
-</form>
-<br>
-<% authors.forEach(author => { %>
-    <div>Author_id = <%=author.AuthorID%>; name = <%= author.name %></div>
-<% }); %>
+<h2>Most viewed authors</h2>
+<table>
+    <tbody>
+        <tr>
+            <%views.forEach(auth=>{%>
+                <td>
+                    <div><img src="<%=auth.aImage%>" height="200" width="282" alt="<%=auth.aname%>"></div>
+                    <h3><a href="/authors/author?id=<%=auth.id%>"><%=auth.aname%></a></h3>
+                    <h4>Views: <%=auth.s%></h4>
+                </td>
+            <%})%>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Most voted authors</h2>
+<table>
+    <tbody>
+        <tr>
+            <%views.forEach(auth=>{%>
+                <td>
+                    <div><img src="<%=auth.aImage%>" height="200" width="282" alt="<%=auth.aname%>"></div>
+                    <h3><a href="/authors/author?id=<%=auth.id%>"><%=auth.aname%></a></h3>
+                    <h4>Votes: <%=auth.s%></h4>
+                </td>
+            <%})%>
+        </tr>
+    </tbody>
+</table>

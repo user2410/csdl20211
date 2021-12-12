@@ -1,3 +1,4 @@
+<strong><%=books.length%> book(s) found</strong>
 <table>
     <thead>
         <tr>
@@ -5,6 +6,8 @@
             <td>Title</td>
             <td>Author</td>
             <td>Category</td>
+            <td>Views</td>
+            <td>Votes</td>
         </tr>
     </thead>
     <tbody>
@@ -14,6 +17,8 @@
                 <td><a href="/books/book?id=<%=book.bookID%>"><%=book.title%></a></td>
                 <td><a href="/authors/author?id=<%=book.authorID%>"><%=book.aname%></a></td>
                 <td><a href="/books/cats?id=<%=book.catID%>"><%=book.catname%></a></td>
+                <td><%=book.views%></td>
+                <td><%=book.votes%></td>
             </tr>
         <% }) %>
     </tbody>

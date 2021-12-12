@@ -1,6 +1,9 @@
-<%if(isError){%>
+<%if(image){%><img src="image" alt="+_+">
+<%}else{%>
     <img src="/sad_robot.png" alt="-_-">
+<%}%>
+<%if(isError){%>
     <h3>Oops, something went wrong</h3>
 <%}%>
-<%if(image){%><img src="image" alt="+_+"><%}%>
-<%=message%>
+<p><%=message%></p>
+<a href="/">Get back to home page</a>

@@ -1,0 +1,18 @@
+<%if(locals.books){%>
+    <%=cat.name%> (<%=books.length%> books)
+    <%- include('book_list.ejs')%>
+<%}%>
+
+<%if(locals.cats){%>
+    <%let i=0;%>
+    <table>
+        <tbody>
+            <tr>
+            <%cats.forEach(cat=>{%>
+                <%if(i++==3){%></tr><tr><%}%>
+                <td><a href="/books/cats/<%=cat.id%>"><%=cat.name%></a></td>
+            <%})%>
+            </tr>
+        </tbody>
+    </table>
+<%}%>

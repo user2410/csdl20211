@@ -1,0 +1,70 @@
+<table>
+    <tbody>
+        <tr>
+            <td><img src="<%=book.coverImage%>" alt="<%=book.title%>" height="400" width="300"></td>
+            <td>
+                <h2><%=book.title%></h2>
+                <h3>by <%book.authors.forEach(a=>{%><a href="/authors/author?id=<%=a.id%>"><%=a.aname%></a>&MediumSpace;<%})%></h3>
+                <h4>Categories: <%book.cats.forEach(cat=>{%><a href="/books/cats?id=<%=cat.id%>"><%=cat.name%></a>&MediumSpace;<%})%></h4>
+                <h4>Publish date: <%=book.pbDate.toISOString().split('T')[0]%></h4>
+                <h4>
+                    <label for="views">Views:</label> <span id="views"><%=book.views%></span>|
+                    <label for="votes">Votes:</label> <span id="votes"><%=book.votes%></span>
+                </h4>
+                <h4>Price: $<%=book.price%></h4>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<button type="button" id="btn_vote" class="btn vote">Vote this book</button>
+<button type="button" id="btn_borrow_prop" class="btn borrow prop">Borrow a copy</button>
+<div id="borrow_info" style="display: none">
+    <form action="/users/borrow" method="POST">
+        <select name="borrow_time" id="borrow_time">
+            <option value="0"></option>
+            <% [1, 5, 15, 30, 90].forEach(t => { %>
+                <option value="<%=t%>"><%=t%> days</option>
+            <% }); %>
+        </select>
+        <input type="hidden" name="bookID" value="<%=book.id%>">
+        <button type="submit" class="btn borrow submit">Accept</button>
+    </form>
+    <div>Your account needs at least $<%=book.price%> to complete the operation</div>
+    <div>$<%=book.price/2%> will be subtracted from your credit</div>
+    <div>Please return this copy before <span id="return_date" class="return date"><%=new Date().toISOString().split('T')[0]%></span></div>
+</div>
+
+<div>
+    <h2>Description</h2>
+    <p><%=book.bdesc%></p>
+</div>
+
+<script>
+    document.getElementById('btn_vote').addEventListener('click', ()=>{
+        let btn = this;
+        let req = new XMLHttpRequest();
+        req.open('PUT', '/books/vote/<%=book.id%>');
+        req.onload = function(){
+            let response = JSON.parse(req.responseText);
+            alert(response.message);
+            if(response.success == true){
+                btn.remove();
+                let votes = document.getElementById('votes');
+                votes.innerHTML = `${parseInt(votes.innerHTML)+1}`;
+            }
+        }
+        req.send();
+    })
+
+    document.getElementById('btn_borrow_prop').addEventListener('click', ()=>{
+        document.getElementById('borrow_info').style.display = "block";
+    })
+
+    document.getElementById('borrow_time').addEventListener('change', (event)=>{
+        let time = parseInt(event.target.value);
+        let today = new Date();
+        let returnDate = new Date(today.getTime() + time*24*60*60*1000);
+        document.getElementById('return_date').innerHTML = `${returnDate.toISOString().split('T')[0]}`;
+    })
+</script>

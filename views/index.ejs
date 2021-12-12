@@ -1,6 +1,9 @@
-<%- include('books/search_form.ejs') %>
+<button type="button" id="btn_search"><img src="/Search_Icon.svg" height="20" width="20" alt="Search"></button>
+<div id="search_form" style="display: none;"><%- include('books/search_form.ejs') %></div>
+<br>
 <% let i=0;%>
 <h2>Most voted books</h2>
+<a href="/books?orderBy=votes&order=desc">See more</a>
 <table>
     <tbody>
         <tr>
@@ -8,7 +11,7 @@
             <%if(i++ == 3){%></tr><tr><%}%>
             <td>
                 <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
-                <h3><%=b.title%></h3>
+                <h3><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h3>
                 <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
             </td>
         <% }) %>
@@ -18,6 +21,7 @@
 
 <%i=0;%>
 <h2>Most viewed books</h2>
+<a href="/books?orderBy=views&order=desc">See more</a>
 <table>
     <tbody>
         <tr>
@@ -25,7 +29,7 @@
             <%if(i++ == 3){%></tr><tr><%}%>
             <td>
                 <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
-                <h3><%=b.title%></h3>
+                <h3><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h3>
                 <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
             </td>
         <% }) %>
@@ -35,6 +39,7 @@
 
 <%i=0;%>
 <h2>New books</h2>
+<a href="/books?orderBy=createAt&order=desc">See more</a>
 <table>
     <tbody>
         <tr>
@@ -42,10 +47,15 @@
             <%if(i++ == 3){%></tr><tr><%}%>
             <td>
                 <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
-                <h3><%=b.title%></h3>
+                <h3><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h3>
                 <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
             </td>
         <% }) %>
         </tr>
     </tbody>
 </table>
+<script>
+    document.getElementById('btn_search').addEventListener('click', ()=>{
+            document.getElementById('search_form').style.display = 'block';
+    })
+</script>

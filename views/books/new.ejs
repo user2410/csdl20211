@@ -1,0 +1,89 @@
+<h2>Contribute a new book to my library</h2>
+<form action="/books/new" method="POST">
+    <div>
+        <label for="">ISBN</label>
+        <input type="number" name="id" required>
+    </div>
+    <div>
+        <label for="">Title</label>
+        <input type="text" name="title" maxlength="50" required>
+    </div>
+    <div>
+        <label for="">Authors</label>
+        <input type="text" name="author0" required>
+        <span id="auths_container"></span>
+        <button type="button" id="add_auth">Add</button>
+        <button type="button" id="rem_auth">Remove</button>
+    </div>
+    <div>
+        <label for="">Categor(ies)</label>
+        <select name="cat0" id="" required>
+            <%cats.forEach(cat=>{%>
+                <option value="<%cat.id%>"><%=cat.name%></option>
+            <%})%>
+        </select>
+        <span id="cats_container"></span>
+        <button type="button" id="add_cat">Add</button>
+        <button type="button" id="rem_cat">Remove</button>
+    </div>
+    <div>
+        <label for="">Publish date</label>
+        <input type="date" name="pbDate" required>
+    </div>
+    <div>
+        <label for="">Copies</label>
+        <input type="number" name="copies" max="30">
+    </div>
+    <div>
+        <label for="">Description</label>
+        <textarea name="desc" id="" cols="50" rows="10" placeholder="A short description of the new book (at most 5000 characters)"></textarea>
+    </div>
+    <div>
+        <label for="">Book cover (file size &lt;= 1mb)</label>
+        <input type="file" id="uploaded_img" accept="image/png, image/jpeg" required>
+        <input type="hidden" name="imgType" id="imgType">
+        <input type="hidden" name="imgContent" id="imgContent">
+    </div>
+    <button type="submit">Submit</button>
+</form>
+
+<div class="image-preview" id="imagePreview">
+    <img src="" alt="Image preview" class="image-preview__image">
+    <span class="image-preview__default-text">Image preview</span>
+</div>
+
+<%const _cats = JSON.stringify(cats);%>
+
+<script src="/scripts/img_preview.js"></script>
+<script>
+    // propagate new authors fields
+    let auth_count=1;
+    document.getElementById('add_auth').addEventListener('click', ()=>{
+        let input   = document.createElement('input');
+        input.type  = 'text';
+        input.name  = `auth${auth_count++}`;
+        input.id    = input.name;
+        document.getElementById('auths_container').appendChild(input);
+    })
+    
+    document.getElementById('rem_auth').addEventListener('click', ()=>{document.getElementById(`auth${auth_count--}`).remove();})
+
+    // propagate new authors fields
+    let cat_count=1;
+    const cats = JSON.parse('<%=_cats%>');
+    document.getElementById('add_cat').addEventListener('click', ()=>{
+        let select  = document.createElement('select');
+        select.name = `cat${cat_count++}`;
+        select.id   = select.name;
+        cats.forEach(cat=>{
+            let option = document.createElement('option');
+            option.value = `${cat.id}`;
+            option.text = cat.name;
+            select.appendChild(option);
+        })
+        document.getElementById('cats_container').appendChild(select);
+    })
+
+    document.getElementById('rem_cat').addEventListener('click', ()=>{document.getElementById(`auth${cat_count--}`).remove();})
+
+</script>
