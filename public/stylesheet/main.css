@@ -1,0 +1,22 @@
+@import 'shared/variables.css';
+@import 'shared/img_preview.css';
+
+:root {
+  font-size: 20px;
+  color: var(--color-text-light);
+}
+
+.background_img {
+  background-image: url('/background_library.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100%;
+  filter: blur(8px); /* Adding blur background image */
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  margin-bottom: 3rem;
+}
