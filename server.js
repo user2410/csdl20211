@@ -22,7 +22,8 @@ app.use(flash());
 app.use(session({
     secret: process.env.SESSION_SECRET || 'vj34rc249123rn',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {expires: 1800000}
 }));
 app.use(ppconfig.passport.initialize())
 app.use(ppconfig.passport.session());
@@ -33,7 +34,8 @@ app.use((req, res, next)=>{
     res.locals.cats = db.cats;
     res.locals.user = req.isAuthenticated() ? req.user : null;
     next();
-})
+});
+
 const indexRouter   = require('./routes/index');
 const authorRouter  = require('./routes/authors');
 const bookRouter    = require('./routes/books');

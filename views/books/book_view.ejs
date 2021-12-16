@@ -2,34 +2,36 @@
     <tbody>
         <tr>
             <td><img src="<%=book.coverImage%>" alt="<%=book.title%>" height="400" width="300"></td>
-            <td>
+            <td style="padding: 5px 1em 0 2em">
                 <h2><%=book.title%></h2>
                 <h3>by <%book.authors.forEach(a=>{%><a href="/authors/author?id=<%=a.id%>"><%=a.aname%></a>&MediumSpace;<%})%></h3>
                 <h4>Categories: <%book.cats.forEach(cat=>{%><a href="/books/cats?id=<%=cat.id%>"><%=cat.name%></a>&MediumSpace;<%})%></h4>
                 <h4>Publish date: <%=book.pbDate.toISOString().split('T')[0]%></h4>
                 <h4>
-                    <label for="views">Views:</label> <span id="views"><%=book.views%></span>|
+                    <label for="views">Views:</label> <span id="views"><%=book.views+1%></span>|
                     <label for="votes">Votes:</label> <span id="votes"><%=book.votes%></span>
                 </h4>
                 <h4>Price: $<%=book.price%></h4>
+                <h4><span id="ncopies"><%=book.copies%></span> cop(ies) available</h4>
+                <%if(user){%>
+                <button type="button" id="btn_vote" class="btn vote">Vote this book</button>
+                <%if(user.role == 'member' && book.copies>0){%>
+                <button type="button" id="btn_borrow_prop" class="btn borrow prop">Borrow a copy</button><%}%>
+                <%}%>
             </td>
         </tr>
     </tbody>
 </table>
 
-<button type="button" id="btn_vote" class="btn vote">Vote this book</button>
-<button type="button" id="btn_borrow_prop" class="btn borrow prop">Borrow a copy</button>
-<div id="borrow_info" style="display: none">
-    <form action="/users/borrow" method="POST">
-        <select name="borrow_time" id="borrow_time">
-            <option value="0"></option>
-            <% [1, 5, 15, 30, 90].forEach(t => { %>
-                <option value="<%=t%>"><%=t%> days</option>
-            <% }); %>
-        </select>
-        <input type="hidden" name="bookID" value="<%=book.id%>">
-        <button type="submit" class="btn borrow submit">Accept</button>
-    </form>
+<div id="borrow_info" hidden>
+    <label for="borrow_time">Period</label>
+    <select name="borrow_time" id="borrow_time">
+        <option value="0"></option>
+        <% [1, 5, 15, 30, 90].forEach(t => { %>
+            <option value="<%=t%>"><%=t%> days</option>
+        <% }); %>
+    </select>
+    <button type="button" id="btn_borrow_submit">Accept</button>
     <div>Your account needs at least $<%=book.price%> to complete the operation</div>
     <div>$<%=book.price/2%> will be subtracted from your credit</div>
     <div>Please return this copy before <span id="return_date" class="return date"><%=new Date().toISOString().split('T')[0]%></span></div>
@@ -41,15 +43,15 @@
 </div>
 
 <script>
-    document.getElementById('btn_vote').addEventListener('click', ()=>{
-        let btn = this;
+    const btn_vote = document.getElementById('btn_vote');
+    btn_vote.addEventListener('click', ()=>{
         let req = new XMLHttpRequest();
         req.open('PUT', '/books/vote/<%=book.id%>');
         req.onload = function(){
             let response = JSON.parse(req.responseText);
             alert(response.message);
             if(response.success == true){
-                btn.remove();
+                btn_vote.remove();
                 let votes = document.getElementById('votes');
                 votes.innerHTML = `${parseInt(votes.innerHTML)+1}`;
             }
@@ -57,14 +59,36 @@
         req.send();
     })
 
-    document.getElementById('btn_borrow_prop').addEventListener('click', ()=>{
-        document.getElementById('borrow_info').style.display = "block";
-    })
+    const btn_borrow_prop = document.getElementById('btn_borrow_prop');
+    const borrow_info = document.getElementById('borrow_info');
+    const btn_borrow_submit = document.getElementById('btn_borrow_submit');
+    const borrow_time = document.getElementById('borrow_time');
+    if(btn_borrow_prop){btn_borrow_prop.addEventListener('click', ()=>{
+        borrow_info.hidden = borrow_info.hidden == true ? false : true;
+    })}
 
-    document.getElementById('borrow_time').addEventListener('change', (event)=>{
+    borrow_time.addEventListener('change', (event)=>{
         let time = parseInt(event.target.value);
         let today = new Date();
         let returnDate = new Date(today.getTime() + time*24*60*60*1000);
         document.getElementById('return_date').innerHTML = `${returnDate.toISOString().split('T')[0]}`;
+    })
+
+    btn_borrow_submit.addEventListener('click', ()=>{
+        let req = new XMLHttpRequest();
+        let data = `bookID=<%=book.id%>&period=${borrow_time.value}`;
+        req.open('POST', '/users/borrow');
+        req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        req.onload = function(){
+            let response = JSON.parse(req.responseText);
+            alert(response.message);
+            if(response.success == true){
+                borrow_info.remove();
+                btn_borrow_prop.remove();
+                let votes = document.getElementById('votes');
+                votes.innerHTML = `${parseInt(votes.innerHTML)+1}`;
+            }
+        }
+        req.send(data);
     })
 </script>

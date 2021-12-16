@@ -1,61 +1,41 @@
-<button type="button" id="btn_search"><img src="/Search_Icon.svg" height="20" width="20" alt="Search"></button>
-<div id="search_form" style="display: none;"><%- include('books/search_form.ejs') %></div>
-<br>
-<% let i=0;%>
-<h2>Most voted books</h2>
-<a href="/books?orderBy=votes&order=desc">See more</a>
-<table>
-    <tbody>
-        <tr>
-        <%votes.forEach(b=>{%>
-            <%if(i++ == 3){%></tr><tr><%}%>
-            <td>
-                <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
-                <h3><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h3>
-                <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
-            </td>
-        <% }) %>
-        </tr>
-    </tbody>
-</table>
+<div class="d-flex bd-highlight flex-row">
+    <h2 class="h3 p-2 w-90 bd-highlight">Most voted books</h2>
+    <a class="p-2 flex-shrink-1 bd-highlight" href="/books?orderBy=votes&order=desc">See more</a>
+</div>
+<div class="container d-flex justify-content-between flex-wrap">
+    <%votes.forEach(b=>{%>
+        <div style="width: 200px;" class="m-2">
+            <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
+            <h4><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h4>
+            <h5>Views: <%=b.views%>| Votes: <%=b.votes%></h5>
+        </div>
+    <% }) %>
+</div>
 
-<%i=0;%>
-<h2>Most viewed books</h2>
-<a href="/books?orderBy=views&order=desc">See more</a>
-<table>
-    <tbody>
-        <tr>
-        <%views.forEach(b=>{%>
-            <%if(i++ == 3){%></tr><tr><%}%>
-            <td>
-                <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
-                <h3><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h3>
-                <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
-            </td>
-        <% }) %>
-        </tr>
-    </tbody>
-</table>
+<div class="d-flex bd-highlight flex-row">
+    <h2 class="h3 p-2 w-90 bd-highlight">Most viewed books</h2>
+    <a class="p-2 flex-shrink-1 bd-highlight" href="/books?orderBy=views&order=desc">See more</a>
+</div>
+<div class="container d-flex justify-content-between flex-wrap">
+    <%views.forEach(b=>{%>
+        <div style="width: 200px;" class="m-2">
+            <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
+            <h4><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h4>
+            <h5>Views: <%=b.views%>| Votes: <%=b.votes%></h5>
+        </div>
+    <% }) %>
+</div>
 
-<%i=0;%>
-<h2>New books</h2>
-<a href="/books?orderBy=createAt&order=desc">See more</a>
-<table>
-    <tbody>
-        <tr>
-        <%news.forEach(b=>{%>
-            <%if(i++ == 3){%></tr><tr><%}%>
-            <td>
-                <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
-                <h3><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h3>
-                <h4>Views: <%=b.views%>| Votes: <%=b.votes%></h4>
-            </td>
-        <% }) %>
-        </tr>
-    </tbody>
-</table>
-<script>
-    document.getElementById('btn_search').addEventListener('click', ()=>{
-            document.getElementById('search_form').style.display = 'block';
-    })
-</script>
+<div class="d-flex bd-highlight flex-row">
+    <h2 class="h3 p-2 w-90 bd-highlight">New books</h2>
+    <a class="p-2 flex-shrink-1 bd-highlight" href="/books?orderBy=createAt&order=desc">See more</a>
+</div>
+<div class="container d-flex justify-content-between flex-wrap">
+    <%news.forEach(b=>{%>
+        <div style="width: 200px;" class="m-2">
+            <div><img src="<%=b.coverImage%>" alt="<%=b.title%>" height="300" width="200"></div>
+            <h4><a href="/books/book?id=<%=b.id%>"><%=b.title%></a></h4>
+            <h5>Views: <%=b.views%>| Votes: <%=b.votes%></h5>
+        </div>
+    <% }) %>
+</div>

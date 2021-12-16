@@ -1,29 +1,21 @@
 <h2>Most viewed authors</h2>
-<table>
-    <tbody>
-        <tr>
-            <%views.forEach(auth=>{%>
-                <td>
-                    <div><img src="<%=auth.aImage%>" height="200" width="282" alt="<%=auth.aname%>"></div>
-                    <h3><a href="/authors/author?id=<%=auth.id%>"><%=auth.aname%></a></h3>
-                    <h4>Views: <%=auth.s%></h4>
-                </td>
-            <%})%>
-        </tr>
-    </tbody>
-</table>
+<div class="container d-flex justify-content-between flex-wrap">
+    <%views.forEach(auth=>{%>
+        <div style="width: 200px;" class="m-2">
+            <div><img src="<%=auth.aImage%>" height="200" width="230" style="border-radius: 50%" alt="<%=auth.aname%>"></div>
+            <h4><a href="/authors/author?id=<%=auth.id%>"><%=auth.aname%></a></h4>
+            <h5>Views: <%=auth.s%></h5>
+        </div>
+    <% }) %>
+</div>
 
 <h2>Most voted authors</h2>
-<table>
-    <tbody>
-        <tr>
-            <%views.forEach(auth=>{%>
-                <td>
-                    <div><img src="<%=auth.aImage%>" height="200" width="282" alt="<%=auth.aname%>"></div>
-                    <h3><a href="/authors/author?id=<%=auth.id%>"><%=auth.aname%></a></h3>
-                    <h4>Votes: <%=auth.s%></h4>
-                </td>
-            <%})%>
-        </tr>
-    </tbody>
-</table>
+<div class="container d-flex justify-content-between flex-wrap">
+    <%votes.forEach(auth=>{%>
+        <div style="width: 200px;" class="m-2">
+            <div><img src="<%=auth.aImage%>" height="200" width="230" style="border-radius: 50%" alt="<%=auth.aname%>"></div>
+            <h4><a href="/authors/author?id=<%=auth.id%>"><%=auth.aname%></a></h4>
+            <h5>Votes: <%=auth.s%></h5>
+        </div>
+    <% }) %>
+</div>

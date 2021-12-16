@@ -1,25 +1,27 @@
 <strong><%=books.length%> book(s) found</strong>
-<table>
-    <thead>
-        <tr>
-            <td>Cover</td>
-            <td>Title</td>
-            <td>Author</td>
-            <td>Category</td>
-            <td>Views</td>
-            <td>Votes</td>
-        </tr>
-    </thead>
-    <tbody>
-        <% books.forEach(book => { %>
+<div class="container">
+    <table class="table">
+        <thead>
             <tr>
-                <td><img src="<%=book.coverImage%>" alt="book.title" height="150" width="100"></td>
-                <td><a href="/books/book?id=<%=book.bookID%>"><%=book.title%></a></td>
-                <td><a href="/authors/author?id=<%=book.authorID%>"><%=book.aname%></a></td>
-                <td><a href="/books/cats?id=<%=book.catID%>"><%=book.catname%></a></td>
-                <td><%=book.views%></td>
-                <td><%=book.votes%></td>
+                <td>Cover</td>
+                <td>Title</td>
+                <td>Author</td>
+                <td>Category</td>
+                <td>Views</td>
+                <td>Votes</td>
             </tr>
-        <% }) %>
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            <% books.forEach(book => { %>
+                <tr>
+                    <td><img src="<%=book.coverImage%>" alt="book.title" height="150" width="100"></td>
+                    <td><a href="/books/book?id=<%=book.bookID||book.id%>"><%=book.title%></a></td>
+                    <td><a href="/authors/author?id=<%=book.authorID%>"><%=book.aname%></a></td>
+                    <td><a href="/books/cats?id=<%=book.catID%>"><%=book.catname%></a></td>
+                    <td><%=book.views%></td>
+                    <td><%=book.votes%></td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+</div>

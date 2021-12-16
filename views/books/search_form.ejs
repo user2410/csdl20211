@@ -1,31 +1,36 @@
 <h2>Seach for books ...</h2>
 <form action="/books" method="GET">
-    <div>
-        <label for="title">Title</label>
-        <input type="text" name="title" id="title" maxlength="30" required>
-        <label for="aname">Author</label>
-        <input type="text" name="aname" id="aname" maxlength="30">
-        <label for="cat">Category</label>
-        <select name="cat" id="cat">
-            <option value="0"></option>
-            <%cats.forEach(cat => {%>
-                <option value="<%=cat.id%>"><%=cat.name%></option>
-            <%})%>
-        </select>
+    <div class="container d-flex justify-content-between flex-wrap">
+        <div class="mb-3">
+            <div>
+                <label for="title">Title</label>
+                <input type="text" name="title" id="title" maxlength="30" required>
+                <label for="aname">Author</label>
+                <input type="text" name="aname" id="aname" maxlength="30">
+                <label for="cat">Category</label>
+                <select name="cat" id="cat">
+                    <option value="0"></option>
+                    <%cats.forEach(cat => {%>
+                        <option value="<%=cat.id%>"><%=cat.name%></option>
+                    <%})%>
+                </select>
+            </div>
+            <div>
+                <label for="orderBy">Order by</label>
+                <select name="orderBy" id="orderBy">
+                    <option value="votes">Votes</option>
+                    <option value="title">Title</option>
+                    <option value="views">Views</option>
+                </select>
+                <label for="order">In order</label>
+                <select name="order">
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                </select>
+            </div>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Find</button>
+        </div>
     </div>
-
-    <div>
-        <label for="orderBy">Order by</label>
-        <select name="orderBy" id="orderBy">
-            <option value="votes">Votes</option>
-            <option value="title">Title</option>
-            <option value="views">Views</option>
-        </select>
-        <label for="order">In order</label>
-        <select name="order">
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
-        </select>
-    </div>
-    <button type="submit">Find</button>
 </form>

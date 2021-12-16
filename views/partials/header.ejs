@@ -1,29 +1,54 @@
-<header>
-    <nav>
-        <a href='/'>My library</a>
-        <ul>
-            <li><a href="/authors">Authors</a></li>
-            <li><a href="/books/cats">Categories</a></li>
-            <%if(user){%>
-            <li>Hello <a href="/users/" id="user_prof"><%=user.name%></a></li>
-            <%switch (user.role) {
-                case 'member': %>
-                    <li><a href="/books/new">Add a new book</a></li>
-                    <li><a href="/users/borrow">Borrowed books</a></li>
-                    <% break;
-                case 'staff': %>
-                    <li><a href="/users/requests/books">Books requests</a></li>
-                    <li><a href="/users/requests/authors">Authors requests</a></li>
-                    <% break;
-                case 'admin': %>
-                    <li><a href="/users/manage">Manage</a></li>
-                    <% break; 
-            } %>
-            <li><form action="/logout?_method=DELETE" method="POST"><button type="submit" id="btn_logout">Logout</button></form></li>
-            <% }else{ %>
-                <li><a href="/login">Login</a></li>
-                <li><a href="/register">Register</a></li>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/">My library</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/authors">Authors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/books/cats">Categories</a>
+            </li>
+            <%if(!locals.user){%>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/login">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/register">Register</a>
+                </li>
+            <%}else{%>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Hello <%=user.name%>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <%switch (user.role) {
+                        case 'member': %>
+                            <li><a class="dropdown-item" href="/books/new">Add a new book</a></li>
+                            <li><a class="dropdown-item" href="/users/borrow">Borrowed books</a></li>
+                            <li><span class="dropdown-item">Credit: $<%-user.credit%></span></li>
+                            <% break;
+                        case 'staff': %>
+                            <li><a class="dropdown-item" href="/users/requests/books">Books requests</a></li>
+                            <li><a class="dropdown-item" href="/users/requests/authors">Authors requests</a></li>
+                            <% break;
+                        case 'admin': %>
+                            <li><a class="dropdown-item" href="/users/manage">Manage members</a></li>
+                            <% break; 
+                    } %>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><form action="/logout?_method=DELETE" method="POST" class="dropdown-item"><button type="submit" id="btn_logout">Logout</button></form></li>
+                </ul>
+            </li>
             <%}%>
         </ul>
-    </nav>
-</header>
+        <form class="d-flex" action="/books" method="GET">
+          <input class="form-control me-2" type="search" name="title" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>

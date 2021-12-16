@@ -1,46 +1,55 @@
 <img src="<%=author.aImage%>" alt="<%=author.aname%>" height="200" width="282">
 <h2><%=author.aname%></h2>
 
-<%if(author.adesc.length==0){%>
-    <button type="button" id="auth_update_prop">Update this author's info</button>
+<%if(!author.adesc || author.aImage == '/unknown_author.png'){%>
+<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#update_info" aria-expanded="false" aria-controls="update_info">Update this author's info</button>
+<div id="update_info" class="collapse">
+    <form action="/authors/addinfo" method="POST">
+        <input type="hidden" name="authorID" value="<%=author.id%>">
+
+        <div class="d-flex justify-content-between">
+            <div class="mb-3">
+                <label for="uploaded_img" class="form-label">Author's photo</label>
+                <input type="file" id="uploaded_img" accept="image/png, image/jpeg" required>
+                <input type="hidden" name="imgType" id="imgType">
+                <input type="hidden" name="imgContent" id="imgContent">
+                <div class="image-preview" id="imagePreview">
+                    <img src="" alt="Image preview" class="image-preview__image">
+                    <span class="image-preview__default-text">Image preview</span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="update_bio" class="form-label">Author's biography</label>
+                <textarea name="update_bio" id="update_bio" class="form-control" cols="50" rows="10" maxlength="1000" placeholder="A short description (1000 characters at most)"></textarea>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>
 <%}%>
 
-<div>
-    <h2>Biography</h2>
-    <p><%=author.adesc%></p>
-    <div id="update_info" style="display: none;">
-        <form action="/authors/addinfo" method="POST">
-            <input type="hidden" name="authorID" value="<%=author.id%>">
-
-            <label for="uploaded_img">Author's photo</label>
-            <input type="file" id="uploaded_img" accept="image/png, image/jpeg" required>
-            <input type="hidden" name="imgType" id="imgType">
-            <input type="hidden" name="imgContent" id="imgContent">
-
-            <label for="update_bio">Author's biography</label>
-            <textarea name="update_bio" id="update_bio" cols="50" rows="10" maxlength="1000" placeholder="A short description (1000 characters at most)"></textarea>
-
-            <button type="submit">Submit</button>
-        </form>
-        <div class="image-preview" id="imagePreview">
-            <img src="" alt="Image preview" class="image-preview__image">
-            <span class="image-preview__default-text">Image preview</span>
-        </div>
+<p>
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#bio" role="button" aria-expanded="false" aria-controls="bio">
+      Biography
+    </a>
+    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#pbbooks" aria-expanded="false" aria-controls="pbbooks">
+      Published books
+    </button>
+</p>
+<div class="collapse" id="bio">
+    <div class="card card-body">
+        <%=author.adesc%>
     </div>
 </div>
-<div>
-    <h2>Published books</h2>
-    <%if(books.length > 0){%>
-        <%-include('../books/book_list.ejs')%>
-    <%}%>
+<div class="collapse" id="pbbooks">
+    <div class="card card-body">
+        <%if(books.length > 0){%>
+            <%-include('../books/book_list.ejs')%>
+        <%}%>
+    </div>
 </div>
 
 <script src="/scripts/img_preview.js"></script>
-<script>
-    const update_btn = document.getElementById('auth_update_prop');
-    if(update_btn){
-        update_btn.addEventListener('click', ()=>{
-            document.getElementById('update_info').style.display = 'block';
-        })
-    }
-</script>

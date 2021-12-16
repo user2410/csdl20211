@@ -48,7 +48,7 @@ router.post('/addinfo', async (req, res)=>{
             authorID: req.body.authorID,
             userID: req.user.id,
             aImageType: req.body.imgType,
-            aImage: `x'${Buffer.from(req.body.imgContent, 'base64').toString('hex')}'`,
+            aImage: Buffer.from(req.body.imgContent, 'base64'),
             adesc: req.body.update_bio
         }
         await db.uquery('INSERT INTO new_authors_info SET ?', update_info);

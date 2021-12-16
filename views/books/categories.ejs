@@ -1,18 +1,17 @@
 <%if(locals.books){%>
-    <%=cat.name%> (<%=books.length%> books)
+    <h2><%=cat.name%></h2>
     <%- include('book_list.ejs')%>
-<%}%>
-
-<%if(locals.cats){%>
-    <%let i=0;%>
-    <table>
-        <tbody>
-            <tr>
-            <%cats.forEach(cat=>{%>
-                <%if(i++==3){%></tr><tr><%}%>
-                <td><a href="/books/cats/<%=cat.id%>"><%=cat.name%></a></td>
-            <%})%>
-            </tr>
-        </tbody>
-    </table>
+<%}else{%>
+    <div class="container d-flex flex-wrap">
+    <%cats.forEach(cat=>{%>
+        <a href="/books/cats?id=<%=cat.id%>">
+        <div class="card">
+            <div class="card-body">
+                <img src="/cats/<%-cat.id%>.png" alt="" height="20" width="20">
+                <%=cat.name%>
+            </div>
+        </div>
+        </a>
+    <%})%>
+    </div>
 <%}%>

@@ -6,9 +6,9 @@ const ppconfig = require('../modules/ppconfig');
 
 router.get('/', (req, res) => {
     Promise.all([
-        db.bquery('SELECT id, title, coverType, coverImage, views, votes FROM books ORDER BY votes DESC LIMIT 6'),
-        db.bquery('SELECT id, title, coverType, coverImage, views, votes FROM books ORDER BY views DESC LIMIT 6'),
-        db.bquery('SELECT id, title, coverType, coverImage, views, votes FROM books ORDER BY createAt DESC LIMIT 6'),
+        db.bquery('SELECT id, title, coverType, coverImage, views, votes FROM books ORDER BY votes DESC LIMIT 8'),
+        db.bquery('SELECT id, title, coverType, coverImage, views, votes FROM books ORDER BY views DESC LIMIT 8'),
+        db.bquery('SELECT id, title, coverType, coverImage, views, votes FROM books ORDER BY createAt DESC LIMIT 8'),
     ]).then((results)=>{
         results.forEach(r => r.forEach(b => b.coverImage = db.getImgURL(b.coverType, b.coverImage, 'b')));
         res.render('index', {

@@ -1,36 +1,42 @@
-<table>
+<%if(books.length>0 ){%>
+<%let ids=[];%>
+<table class="table">
     <thead>
         <tr>
             <td>Book</td>
             <td>Loan date</td>
-            <td>Return date</td>
+            <td>Due date</td>
             <td></td>
         </tr>
     </thead>
     <tbody>
         <%books.forEach(book => {%>
-            <tr id="b<%=book.id%>">
-                <td><a href="/books/book?id=<%=book.id%>"><%book.title%></a></td>
-                <td><%=book.loanDate.toISOString().split('T')[0]%></td>
-                <td><%=book.returnDate.toISOString().split('T')[0]%></td>
-                <td><button id="<%=book.id%>">Return</button></td>
+            <tr id="b<%=book.bookID%>">
+                <%ids.push(book.bookID);%>
+                <td><a href="/books/book?id=<%-book.bookID%>"><%=book.title%></a></td>
+                <td><%-book.loanDate.toISOString().split('T')[0]%></td>
+                <td><%-book.returnDate.toISOString().split('T')[0]%></td>
+                <td><button id="<%-book.bookID%>">Return</button></td>
             </tr>
         <%})%>
     </tbody>
 </table>
-<%const _books = JSON.stringify(books);%>
+<%ids = JSON.stringify(ids);%>
 <script>
-    const books = JSON.parse('<%-_books%>');
-    books.forEach(book => {
-        document.getElementById(`${book.id}`).addEventListener('click', ()=>{
+    const ids = JSON.parse('<%-ids%>');
+    ids.forEach( id => {
+        document.getElementById(`${id}`).addEventListener('click', ()=>{
             let req = new XMLHttpRequest();
-            req.open('DELETE', `/users/borrow/${book.id}`);
+            req.open('DELETE', `/users/borrow/${id}`);
             req.onload = function(){
                 let response = JSON.parse(req.responseText);
                 alert(response.message);
-                if(response.success == true){document.getElementById(`b${book.id}`).remove();}
+                if(response.success == true){document.getElementById(`b${id}`).remove();}
             }
             req.send();
         })
     })
 </script>
+<%}else{%>
+    <h2>No items found</h2>
+<%}%>
