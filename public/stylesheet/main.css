@@ -1,9 +1,8 @@
-@import 'shared/variables.css';
 @import 'shared/img_preview.css';
+@import 'shared/tabs_switch.css';
 
 :root {
-  font-size: 20px;
-  color: var(--color-text-light);
+  font-size: 18px;
 }
 
 .background_img {

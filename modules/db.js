@@ -36,6 +36,13 @@ const getImgURL = function(imgType, imgData, type){
     }
 }
 
+const processDesc = function (desc){
+    while(desc.includes('\n')){
+        desc = desc.replace('\n', '<br>');
+    }
+    return desc;
+}
+
 //SELECT id, name, count(bookID) as counts FROM categories c INNER JOIN book_category bc ON bc.catID = c.id GROUP BY id
 db_books.query('SELECT * FROM categories', (err, res)=>{
     if(err){
@@ -50,3 +57,4 @@ module.exports.users = db_users;
 module.exports.bquery = bquery;
 module.exports.uquery = uquery;
 module.exports.getImgURL = getImgURL;
+module.exports.processDesc = processDesc;

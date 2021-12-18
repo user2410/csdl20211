@@ -2,7 +2,7 @@
 <div class="container d-flex justify-content-between flex-wrap">
     <%views.forEach(auth=>{%>
         <div style="width: 200px;" class="m-2">
-            <div><img src="<%=auth.aImage%>" height="200" width="230" style="border-radius: 50%" alt="<%=auth.aname%>"></div>
+            <div><img src="<%=auth.aImage%>" height="230" width="230" style="border-radius: 50%" alt="<%=auth.aname%>"></div>
             <h4><a href="/authors/author?id=<%=auth.id%>"><%=auth.aname%></a></h4>
             <h5>Views: <%=auth.s%></h5>
         </div>
@@ -13,7 +13,7 @@
 <div class="container d-flex justify-content-between flex-wrap">
     <%votes.forEach(auth=>{%>
         <div style="width: 200px;" class="m-2">
-            <div><img src="<%=auth.aImage%>" height="200" width="230" style="border-radius: 50%" alt="<%=auth.aname%>"></div>
+            <div><img src="<%=auth.aImage%>" height="230" width="230" style="border-radius: 50%" alt="<%=auth.aname%>"></div>
             <h4><a href="/authors/author?id=<%=auth.id%>"><%=auth.aname%></a></h4>
             <h5>Votes: <%=auth.s%></h5>
         </div>

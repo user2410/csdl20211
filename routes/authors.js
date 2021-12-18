@@ -3,6 +3,7 @@ const express   = require('express');
 const router    = express.Router();
 const msg       = require('../modules/message');
 const db        = require('../modules/db');
+const ppconfig = require('../modules/ppconfig');
 
 // All Authors Route
 router.get('/', (req, res) => {
@@ -32,6 +33,7 @@ router.get('/author', async (req, res)=>{
         INNER JOIN book_category bc ON bc.bookID=b.id
         INNER JOIN categories c ON bc.catID=c.id
         GROUP BY b.id`);
+        author.adesc = db.processDesc(author.adesc);
         books.forEach(book=>{
             book.coverImage = db.getImgURL(book.coverType, book.coverImage, 'b');
             book.catname = book.name;
@@ -42,7 +44,7 @@ router.get('/author', async (req, res)=>{
     }
 })
 
-router.post('/addinfo', async (req, res)=>{
+router.post('/addinfo', ppconfig.checkAuthenticated, async (req, res)=>{
     try{
         let update_info = {
             authorID: req.body.authorID,

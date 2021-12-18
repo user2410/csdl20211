@@ -73,12 +73,12 @@ router.put('/accept/:id', ppconfig.isStaff, async (req, res)=>{
                 // insert new authors publish
                 let authors = await db.uquery(`SELECT aname FROM new_publish WHERE id = ${id}`);
                 for(let author of authors){
-                    let present = await db.bquery(`SELECT id FROM authors WHERE aname = '${author.aname}'`);
+                    let present = await db.bquery('SELECT id FROM authors WHERE aname=?', [author.aname]);
                     let aid = null;
                     if(present.length != 0){aid = present[0].id;}
                     else{
-                        await db.bquery(`INSERT INTO authors(aname) VALUES ('${author.aname}')`);
-                        let new_author = await db.bquery('SELECT LAST_INSERT_ID() AS id');
+                        await db.bquery('INSERT INTO authors SET ?', {aname: author.aname});
+                        let new_author = await db.bquery('SELECT id FROM authors WHERE aname=?', [author.aname]);
                         aid = new_author[0].id;
                         new_authors.push(aid);
                     }
@@ -101,10 +101,14 @@ router.put('/accept/:id', ppconfig.isStaff, async (req, res)=>{
             try{
                 await db.bquery(`UPDATE authors a
                 INNER JOIN csdl20211_users.new_authors_info na ON na.authorID = a.id
-                SET a.aImageType = na.aImageType, a.aImage = na.aImage, a.adesc = na.adesc
-                WHERE na.authorID = ${id}`);
+                SET a.adesc = na.adesc
+                WHERE na.authorID = ${id} AND na.adesc IS NOT NULL`);
+                await db.bquery(`UPDATE authors a
+                INNER JOIN csdl20211_users.new_authors_info na ON na.authorID = a.id
+                SET a.aImageType = na.aImageType, a.aImage = na.aImage
+                WHERE na.authorID = ${id} AND na.aImageType IS NOT NULL AND na.aImage IS NOT NULL`);
                 await db.uquery(`DELETE FROM new_authors_info WHERE authorID=${id}`);
-                res.json({success: true, message: 'Successfully added a new author entry'});
+                res.json({success: true, message: 'Successfully updated an author entry'});
             }catch(err){res.status(500).json({success: false, message: err.sqlMessage})}
             break;
         default:
@@ -169,7 +173,7 @@ router.post('/borrow', async (req, res)=>{
         
         await db.bquery(`UPDATE books SET copies = copies - 1 WHERE id = ${req.body.bookID}`);
         updated_copy = true;
-        await db.uquery(`UPDATE users SET credit = credit - ${price >> 1} WHERE id = ${req.user.id}`);
+        await db.uquery(`UPDATE users SET credit = credit - ${price/2} WHERE id = ${req.user.id}`);
         updated_credit = true;
         await db.uquery('INSERT INTO borrow SET ?', {
             bookID: req.body.bookID,
@@ -181,7 +185,7 @@ router.post('/borrow', async (req, res)=>{
         res.json({success: true, message: 'Successfully borrow a copy of this book'})
     }catch(err){
         if(updated_copy){await db.bquery(`UPDATE books SET copies = copies + 1 WHERE id = ${req.body.bookID}`);}
-        if(updated_credit){await db.bquery(`UPDATE users SET credit = credit + ${price >> 1} WHERE id = ${req.user.id}`);}
+        if(updated_credit){await db.bquery(`UPDATE users SET credit = credit + ${price/2} WHERE id = ${req.user.id}`);}
         if(err.errno == 1062) res.json({success: false, message: 'Please return the last copy of this book'});
         else
             res.json({success: false, message: err.sqlMessage});
@@ -203,14 +207,14 @@ router.delete('/borrow/:bookID', async (req, res)=>{
 
         await db.bquery(`UPDATE books SET copies = copies + 1 WHERE id = ${bookID}`);
         updated_copy = true;
-        await db.uquery(`UPDATE users SET credit = credit + ${price >> 1} WHERE id = ${req.user.id}`);
+        await db.uquery(`UPDATE users SET credit = credit + ${price/2} WHERE id = ${req.user.id}`);
         updated_credit = true;
         await db.uquery(`DELETE FROM borrow WHERE bookID=${bookID} AND userID=${req.user.id}`);
 
         res.json({success:true, message: 'Successfully return this copy'});
     }catch(err){
         if(updated_copy){await db.bquery(`UPDATE books SET copies = copies - 1 WHERE id = ${req.body.bookID}`);}
-        if(updated_credit){await db.bquery(`UPDATE users SET credit = credit - ${price >> 1} WHERE id = ${req.user.id}`);}
+        if(updated_credit){await db.bquery(`UPDATE users SET credit = credit - ${price/2} WHERE id = ${req.user.id}`);}
         return res.json({success: false, message: err.sqlMessage})
     }
 })

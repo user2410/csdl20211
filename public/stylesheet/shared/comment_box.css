@@ -1,0 +1,17 @@
+.comments_box {
+    float: left;
+    margin: 2px;
+    padding: 10px;
+    position: relative;
+}
+
+.comments_box-comments {
+    display: block;
+    overflow-y: scroll;
+    height: 260px;
+}
+
+.comments_box-new_comment{
+    position: absolute;
+    bottom: 0;
+}

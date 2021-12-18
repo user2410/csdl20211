@@ -1,13 +1,18 @@
-<img src="<%=author.aImage%>" alt="<%=author.aname%>" height="200" width="282">
-<h2><%=author.aname%></h2>
+<div class="d-flex justify-content-center">
+    <div>
+        <img src="<%=author.aImage%>" alt="<%=author.aname%>" height="282" width="282">
+        <h2 style="margin-left: 20px;"><%=author.aname%></h2>
+    </div>
+</div>
 
-<%if(!author.adesc || author.aImage == '/unknown_author.png'){%>
-<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#update_info" aria-expanded="false" aria-controls="update_info">Update this author's info</button>
-<div id="update_info" class="collapse">
+<%if(!author.adesc || author.aImage == '/unknown_author.png'){let btn_class = 'disabled'; if(user){if(user.role == 'member'){btn_class = '';}}%>
+<button class="btn btn-primary <%-btn_class%>" type="button" data-bs-toggle="collapse" data-bs-target="#update_info" aria-expanded="false" aria-controls="update_info">Update this author's info</button>
+<div id="update_info" class="collapse" style="padding-top: 10px; padding-bottom: 10px">
     <form action="/authors/addinfo" method="POST">
         <input type="hidden" name="authorID" value="<%=author.id%>">
 
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-between flex-wrap">
+            <%if(author.aImage == '/unknown_author.png'){%>
             <div class="mb-3">
                 <label for="uploaded_img" class="form-label">Author's photo</label>
                 <input type="file" id="uploaded_img" accept="image/png, image/jpeg" required>
@@ -18,11 +23,12 @@
                     <span class="image-preview__default-text">Image preview</span>
                 </div>
             </div>
-
+            <%}if(!author.adesc){%>
             <div class="mb-3">
                 <label for="update_bio" class="form-label">Author's biography</label>
-                <textarea name="update_bio" id="update_bio" class="form-control" cols="50" rows="10" maxlength="1000" placeholder="A short description (1000 characters at most)"></textarea>
+                <textarea name="update_bio" id="update_bio" class="form-control" cols="50" rows="10" minlength="100" maxlength="1000" placeholder="A short description (1000 characters at most)"></textarea>
             </div>
+            <%}%>
         </div>
         <div class="d-flex justify-content-center">
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -31,21 +37,15 @@
 </div>
 <%}%>
 
-<p>
-    <a class="btn btn-primary" data-bs-toggle="collapse" href="#bio" role="button" aria-expanded="false" aria-controls="bio">
-      Biography
-    </a>
-    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#pbbooks" aria-expanded="false" aria-controls="pbbooks">
-      Published books
-    </button>
-</p>
-<div class="collapse" id="bio">
-    <div class="card card-body">
-        <%=author.adesc%>
+<div class="tabs" style="margin-top: 10px;">
+    <div class="tabs__sidebar">
+        <button class="tabs__button" data-for-tab="1">Biography</button>
+        <button class="tabs__button" data-for-tab="2">Published books</button>
     </div>
-</div>
-<div class="collapse" id="pbbooks">
-    <div class="card card-body">
+    <div class="tabs__content" data-tab="1">
+        <p><%-author.adesc%></p>
+    </div>
+    <div class="tabs__content" data-tab="2">
         <%if(books.length > 0){%>
             <%-include('../books/book_list.ejs')%>
         <%}%>
@@ -53,3 +53,4 @@
 </div>
 
 <script src="/scripts/img_preview.js"></script>
+<script src="/scripts/tabs_switch.js"></script>

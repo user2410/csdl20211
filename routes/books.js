@@ -51,6 +51,7 @@ router.get('/book', async(req, res)=>{
         book.authors = await db.bquery(`SELECT id, aname FROM authors WHERE id IN (SELECT authorID FROM publish WHERE bookID=${id})`);
         // get all categories
         book.cats = await db.bquery(`SELECT * FROM categories WHERE id IN (SELECT catID FROM book_category WHERE bookID=${id})`);
+        book.bdesc = db.processDesc(book.bdesc);
         res.render('books/book_view', {book: book})
         await db.bquery(`UPDATE books SET views=views+1 WHERE id=${id}`);
     }catch(err){
@@ -69,6 +70,34 @@ router.put('/vote/:bookID', async (req, res)=>{
         if(err.errno == 1062) res.json({success: false, message: 'Already upvoted this book'});
         else
             res.json({success: false, message: err.sqlMessage});
+    }
+})
+
+router.get('/comments/:bookID', async (req, res)=>{
+    let id = parseInt(req.params.bookID);
+    try{
+        if(Number.isNaN(id)){throw req.params.bookID;}
+        let comments = await db.uquery(`SELECT * FROM (SELECT * FROM comments WHERE bookID=${id}) c INNER JOIN (SELECT id, name FROM users) u ON c.userID=u.id`);
+        res.json({success: true, comments: comments});
+    }catch(err){
+        console.error(err);
+        res.json({success: false});
+    }
+})
+
+router.post('/comments/:bookID', async (req, res)=>{
+    if(!req.isAuthenticated()){return res.json({success: false, message: 'Login to post comments'})}
+    try{
+        let comment = {
+            bookID: req.params.bookID,
+            userID: req.user.id,
+            cmnt: req.body.comment
+        }
+        await db.uquery('INSERT INTO comments SET ?', comment);
+        res.json({success: true});
+    }catch(err){
+        console.error(err);
+        res.json({success: false, message: 'error occured'});
     }
 })
 

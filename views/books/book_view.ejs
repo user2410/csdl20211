@@ -1,29 +1,25 @@
-<table>
-    <tbody>
-        <tr>
-            <td><img src="<%=book.coverImage%>" alt="<%=book.title%>" height="400" width="300"></td>
-            <td style="padding: 5px 1em 0 2em">
-                <h2><%=book.title%></h2>
-                <h3>by <%book.authors.forEach(a=>{%><a href="/authors/author?id=<%=a.id%>"><%=a.aname%></a>&MediumSpace;<%})%></h3>
-                <h4>Categories: <%book.cats.forEach(cat=>{%><a href="/books/cats?id=<%=cat.id%>"><%=cat.name%></a>&MediumSpace;<%})%></h4>
-                <h4>Publish date: <%=book.pbDate.toISOString().split('T')[0]%></h4>
-                <h4>
-                    <label for="views">Views:</label> <span id="views"><%=book.views+1%></span>|
-                    <label for="votes">Votes:</label> <span id="votes"><%=book.votes%></span>
-                </h4>
-                <h4>Price: $<%=book.price%></h4>
-                <h4><span id="ncopies"><%=book.copies%></span> cop(ies) available</h4>
-                <%if(user){%>
-                <button type="button" id="btn_vote" class="btn vote">Vote this book</button>
-                <%if(user.role == 'member' && book.copies>0){%>
-                <button type="button" id="btn_borrow_prop" class="btn borrow prop">Borrow a copy</button><%}%>
-                <%}%>
-            </td>
-        </tr>
-    </tbody>
-</table>
+<div class="d-flex justify-content-evenly">
+<div>
+    <img src="<%=book.coverImage%>" alt="<%=book.title%>" height="400" width="300">
+</div>
+<div>
+    <h2><%=book.title%></h2>
+    <h3>by <%book.authors.forEach(a=>{%><a href="/authors/author?id=<%=a.id%>"><%=a.aname%></a>&MediumSpace;<%})%></h3>
+    <h4>Categories: <%book.cats.forEach(cat=>{%><a href="/books/cats?id=<%=cat.id%>"><%=cat.name%></a>&MediumSpace;<%})%></h4>
+    <h4>Publish date: <%=book.pbDate.toISOString().split('T')[0]%></h4>
+    <h4>
+        <label for="views">Views:</label> <span id="views"><%=book.views+1%></span>|
+        <label for="votes">Votes:</label> <span id="votes"><%=book.votes%></span>
+    </h4>
+    <h4>Price: $<%=book.price%></h4>
+    <h4><span id="ncopies"><%=book.copies%></span> cop(ies) available</h4>
+    <%let btn_class = 'disabled'; if(user){if(user.role == 'member'){btn_class = '';}}%>
+    <button type="button" id="btn_vote" class="btn btn-success <%-btn_class%>">Vote this book</button>
+    <button class="btn btn-primary <%-btn_class%>" type="button" data-bs-toggle="collapse" data-bs-target="#borrow_info" aria-expanded="false" aria-controls="borrow_info">Borrow a copy</button>
+</div>
+</div>
 
-<div id="borrow_info" hidden>
+<div id="borrow_info" class="collapse" style="margin-top: 10px; margin-bottom:10px;">
     <label for="borrow_time">Period</label>
     <select name="borrow_time" id="borrow_time">
         <option value="0"></option>
@@ -31,27 +27,44 @@
             <option value="<%=t%>"><%=t%> days</option>
         <% }); %>
     </select>
-    <button type="button" id="btn_borrow_submit">Accept</button>
+    <button type="button" id="btn_borrow_submit" class="btn btn-success">Accept</button>
     <div>Your account needs at least $<%=book.price%> to complete the operation</div>
     <div>$<%=book.price/2%> will be subtracted from your credit</div>
     <div>Please return this copy before <span id="return_date" class="return date"><%=new Date().toISOString().split('T')[0]%></span></div>
 </div>
 
-<div>
-    <h2>Description</h2>
-    <p><%=book.bdesc%></p>
+<div class="tabs" style="margin-top: 10px;">
+    <div class="tabs__sidebar">
+        <button class="tabs__button" data-for-tab="1">Description</button>
+        <button class="tabs__button" data-for-tab="2" id="tabs__button-comments">Reviews</button>
+    </div>
+    <div class="tabs__content" data-tab="1">
+        <p><%-book.bdesc%></p>
+    </div>
+    <div class="tabs__content comments_box" data-tab="2">
+        <div>
+            <div class="card comments_box-comments">
+            </div>
+            <div class="comments_box-new_comment">
+                <form>
+                <input id="new_comment" type="text" style="width: 886px;height: 38.5px;" maxlength="500" minlength="1" <%if(!user){%>placeholder="Please sign in to comment" disabled<%}else{%>placeholder="maximum 500 characters"<%}%>>
+                <button type="submit" id="send_comment" class="btn btn-primary btn-sm" style="margin-bottom: 5px;">send</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
+<script src="/scripts/tabs_switch.js"></script>
 <script>
-    const btn_vote = document.getElementById('btn_vote');
-    btn_vote.addEventListener('click', ()=>{
+    document.getElementById('btn_vote').addEventListener('click', ()=>{
         let req = new XMLHttpRequest();
         req.open('PUT', '/books/vote/<%=book.id%>');
         req.onload = function(){
             let response = JSON.parse(req.responseText);
             alert(response.message);
             if(response.success == true){
-                btn_vote.remove();
+                btn_vote.classList.add('disabled');
                 let votes = document.getElementById('votes');
                 votes.innerHTML = `${parseInt(votes.innerHTML)+1}`;
             }
@@ -63,9 +76,6 @@
     const borrow_info = document.getElementById('borrow_info');
     const btn_borrow_submit = document.getElementById('btn_borrow_submit');
     const borrow_time = document.getElementById('borrow_time');
-    if(btn_borrow_prop){btn_borrow_prop.addEventListener('click', ()=>{
-        borrow_info.hidden = borrow_info.hidden == true ? false : true;
-    })}
 
     borrow_time.addEventListener('change', (event)=>{
         let time = parseInt(event.target.value);
@@ -83,12 +93,65 @@
             let response = JSON.parse(req.responseText);
             alert(response.message);
             if(response.success == true){
-                borrow_info.remove();
-                btn_borrow_prop.remove();
+                borrow_info.classList.add('disabled');
+                btn_borrow_prop.classList.add('disabled');
                 let votes = document.getElementById('votes');
                 votes.innerHTML = `${parseInt(votes.innerHTML)+1}`;
             }
         }
         req.send(data);
+    })
+
+    
+    let comments_box = document.querySelector('.comments_box');
+    let comments_container = comments_box.querySelector('.card');
+    let new_comment = document.getElementById('new_comment');
+    let refresh_time = 0;
+    function append_comment(comment, username){
+        let new_comment_header = document.createElement('div');
+        new_comment_header.classList.add('card-header');
+        new_comment_header.innerText = username;
+        let new_comment_body = document.createElement('div');
+        new_comment_body.classList.add('card-body');
+        new_comment_body.innerText = comment;
+        comments_container.appendChild(new_comment_header);
+        comments_container.appendChild(new_comment_body);
+    }
+    
+    document.getElementById('tabs__button-comments').addEventListener('click', ()=>{
+        if(refresh_time > 5) {return;}
+        let req = new XMLHttpRequest();
+        req.open('GET', '/books/comments/<%-book.id%>');
+        req.onload = function(){
+            let response = JSON.parse(req.responseText);
+            if(!response.success){return alert("Failed to load comments");}
+            // remove all current comments
+            let child = comments_container.lastElementChild;
+            while (child) {
+                comments_container.removeChild(child);
+                child = comments_container.lastElementChild;
+            }
+            // render all comments
+            response.comments.forEach(c => append_comment(c.cmnt, c.name));
+            ++refresh_time;
+        }
+        req.send();
+    })
+
+    document.getElementById('send_comment').addEventListener('click', (event)=>{
+        event.preventDefault();
+        let comment = new_comment.value;
+        let req = new XMLHttpRequest();
+        req.open('POST', '/books/comments/<%-book.id%>');
+        req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        req.onload = function(){
+            let response = JSON.parse(req.responseText);
+            if(response.success){
+                new_comment.value = '';
+                return append_comment(comment, '<%=user ? user.name : "Anonymous"%>');
+            }
+            alert(response.message);
+        }
+        req.send(`comment=${encodeURIComponent(comment)}`);
     })
 </script>
