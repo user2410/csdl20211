@@ -1,0 +1,73 @@
+<% let ids = [];%>
+<table class="table">
+    <thead>
+        <tr>
+            <td scope="col">Author</td>
+            <td scope="col">Profile Image</td>
+            <td scope="col">Biography</td>
+            <td scope="col">Accept/Decline</td>
+        </tr>
+    </thead>
+    <tbody>
+        <% authors.forEach(author => { %>
+            <% ids.push(author.authorID); %>
+            <tr id="a<%=author.authorID%>">
+                <td scope="col"><a href="/authors/author/<%-author.authorID%>"><%=author.aname%></a></td>
+                <td scope="col"><img src="<%-author.aImage%>" height="120" width="120"></td>
+                <td scope="col" id="d<%-author.authorID%>"><%=author.adesc%></td>
+                <td scope="col">
+                    <button id="acc-btn<%-author.authorID%>" class="btn btn-success" value="a<%-author.authorID%>">Accept</button>
+                    <button id="dec-btn<%-author.authorID%>" class="btn btn-danger" value="a<%-author.authorID%>">Decline</button>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
+<% ids = JSON.stringify(ids);%>
+<script>
+    var ids = JSON.parse(`<%-ids%>`);
+    ids.forEach(id => {
+        let acc_btn = document.getElementById(`acc-btn${id}`);
+        acc_btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open("PUT", `/staffs/accept/${acc_btn.value}`);
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(acc_btn.value).remove()}
+            }
+            req.send();
+        })
+
+        let dec_btn = document.getElementById(`dec-btn${id}`);
+        dec_btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open("DELETE", `/staffs/accept/${acc_btn.value}`);
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(dec_btn.value).remove()}
+            }
+            req.send();
+        })
+
+        let desc = document.getElementById(`d${id}`);
+        let see_more_text = document.createElement('span');
+        see_more_text.id = `d_moreText${id}`;
+        see_more_text.innerText = desc.innerText.slice(50);
+        see_more_text.hidden = true;
+        desc.innerText = desc.innerText.slice(0, 50);
+        desc.appendChild(see_more_text);
+        let see_more = document.createElement('a');
+        see_more.id = `d_more${id}`;
+        see_more.href = '#';
+        see_more.innerText = 'See more';
+        desc.appendChild(see_more);
+        see_more.addEventListener('click', function(){
+            let see_more = document.getElementById(`d_more${id}`);
+            see_more.innerText = see_more.innerText=='See more' ? 'See less' : 'See more';
+            let see_more_text = document.getElementById(`d_moreText${id}`);
+            see_more_text.hidden = !see_more_text.hidden;
+        });
+    })
+</script>

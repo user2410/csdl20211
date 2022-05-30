@@ -1,0 +1,37 @@
+<div class="d-flex justify-content-between"">
+    <div>
+        <img src="<%-usr.avatar%>" alt="<%=usr.name%>" width="350" height="350">
+    </div>
+    <div>
+        <div>Name:<%=usr.name%></div>
+        <div>Email: <%=usr.email%></div>
+        <div>Role: <%-usr.role%></div>
+        <div>Status: <%-usr.stat%></div>
+    </div>
+    <div>
+        <%if(usr.id == locals.user.id){%>
+            <button id="changePass">Change password</button>
+            <script>
+                document.getElementById('changePass').addEventListener('click', ()=>{
+                    location.replace('/changePass');
+                })
+            </script>
+        <%}if(locals.user.role=='admin' && usr.role!='admin'){%>
+            <button id="deleteUser">Delete this user</button>
+            <script>            
+                document.getElementById('deleteUser').addEventListener('click', ()=>{
+                    let req = new XMLHttpRequest();
+                    req.open('DELETE','/admin/user/<%-usr.id%>');
+                    req.onload = function(){
+                        let response = JSON.parse(req.responseText);
+                        alert(response.message);
+                        if(response.success){
+                            location.replace('/');
+                        }
+                    }
+                    req.send();
+                })
+            </script>
+        <%}%>
+    </div>
+</div>

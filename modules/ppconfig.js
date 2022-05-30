@@ -2,6 +2,7 @@ const passport  = require('passport');
 const LocalStrategy = require('passport-local').Strategy
 const bcrypt    = require('bcrypt');
 const db        = require('./db');
+const {writeLog} = require('./log');
 
 const authenticateUser = async (email, pass, done) => {
 try {
@@ -21,12 +22,12 @@ try {
 passport.use(new LocalStrategy({ usernameField: 'email', passwordField: 'pass' }, authenticateUser))
 passport.serializeUser((user, done) => done(null, user.id))
 passport.deserializeUser((id, done) => {
-    db.uquery(`SELECT * FROM users WHERE id=${id}`)
+    db.uquery(`SELECT id, name, email, credit, role, stat FROM users WHERE id=${id}`)
     .then((res)=>{
         return done(null, res[0])
     }).catch((err)=>{
         done(err.sqlMessage);
-        process.exit(143);
+        writeLog(err);
     })
 })
 

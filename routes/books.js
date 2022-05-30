@@ -9,78 +9,77 @@ router.get('/', async (req, res)=>{
     let _orderBy = ['title', 'views', 'votes', 'createAt']
     let orderBy = _orderBy.indexOf(req.query.orderBy);
     orderBy = orderBy == -1 ? 1 : orderBy;
-    let _order = ['asc', 'desc']
+    let _order = ['ASC', 'DESC']
     let order = _order.indexOf(req.query.order);
     order = order == -1 ? 1 : order;
-    
-    let book_query = 'SELECT id, title, createAt, coverType, coverImage, views, votes FROM books ';
-    let author_query = 'SELECT id, aname FROM authors ';
-    let cat_query = '';
-    if(req.query.title){if(req.query.title.length > 0){book_query += `WHERE title LIKE '%${db.books.escape(req.query.title).slice(1,-1)}%'`}}
-    if(req.query.aname){if(req.query.title.length > 0){author_query += `WHERE aname LIKE '%${db.books.escape(req.query.aname).slice(1,-1)}%'`}}
     let cat = parseInt(req.query.cat);
-    if(!Number.isNaN(cat) && cat>0){cat_query = `WHERE bc.catID = ${cat}`}
+    cat = Number.isNaN(cat) ? 0 : cat;
+    let lim = parseInt(req.query.lim);
+    lim = Number.isNaN(lim) ? 25 : lim;
 
     try{
-        let books = await db.bquery(`SELECT * FROM (${book_query}) AS b
-        INNER JOIN book_category bc ON bc.bookID = b.id
-        INNER JOIN publish p ON p.bookID = b.id
-        INNER JOIN (${author_query}) a ON a.id = p.authorID
-        ${cat_query} GROUP BY p.bookID ORDER BY b.${_orderBy[orderBy]} ${_order[order]} LIMIT 25`);
+        let books = await db.bquery('CALL generalBookSearch(?, ?, ?, ?, ?, ?)',
+            [req.query.title, req.query.aname, cat, _orderBy[orderBy], _order[order], lim]);
+        books = books[0];
         books.forEach(book=>{
             book.catname = db.cats.find(cat => cat.id = book.catID).name;
             book.coverImage = db.getImgURL(book.coverType, book.coverImage, 'b');
         })
         res.render('books/index', {books: books})
     }catch(err){
-        msg.display(res, 500, err.sqlMessage, null);
+        writeLog(err);
+        msg.display(res, 500, msg.msg500, null);
     }
 })
 
-router.get('/book', async(req, res)=>{
-    let id = parseInt(req.query.id);
-    if(Number.isNaN(id)){return msg.display(res, 400, req.query.id, null);}
-
+router.get('/book/:id', async(req, res)=>{
+    let id = parseInt(req.params.id);
+    if(Number.isNaN(id)){return msg.display(res, 403, msg.msg403+req.params.id, null);}
     try{
         // get the book
-        let book = await db.bquery(`SELECT * FROM books WHERE id=${id}`);
-        if(book.length == 0){throw {sqlMessage: 'book not found'}}
-        book = book[0];
-        book.coverImage = db.getImgURL(book.coverType, book.coverImage, 'b');
-        // get all authors
-        book.authors = await db.bquery(`SELECT id, aname FROM authors WHERE id IN (SELECT authorID FROM publish WHERE bookID=${id})`);
-        // get all categories
-        book.cats = await db.bquery(`SELECT * FROM categories WHERE id IN (SELECT catID FROM book_category WHERE bookID=${id})`);
-        book.bdesc = db.processDesc(book.bdesc);
-        res.render('books/book_view', {book: book})
-        await db.bquery(`UPDATE books SET views=views+1 WHERE id=${id}`);
+        let book = await db.bquery(`CALL getBookDetails(${id})`);
+        if(book[0].length == 0){throw 'book not found'}
+        book[0] = book[0][0];
+        book[0].coverImage = db.getImgURL(book[0].coverType, book[0].coverImage, 'b');
+        book[0].bdesc   = db.processDesc(book[0].bdesc);
+        res.render('books/book_view', {book: book});
     }catch(err){
-        msg.display(res, 500, err.sqlMessage, null);
+        if(err.errno){
+            writeLog(err);
+            msg.display(res, 500, msg.msg500, null);
+        }else{
+            msg.display(res, 403, msg.msg403+err, null);
+        }
     }
 })
 
 // ajax query
 router.put('/vote/:bookID', async (req, res)=>{
-    if(!req.isAuthenticated()){throw {sqlMessage: 'Please sign in to vote this book'}}
+    if(!req.isAuthenticated()){throw 'Please sign in to vote this book'}
+    let bookID = parseInt(req.params.bookID);
+    if(Number.isNaN(bookID)){return msg.display(res, 403, msg.msg403+req.params.bookID, null);}
     try{
-        await db.uquery(`INSERT INTO voted (bookID, userID) VALUES(${req.params.bookID}, ${req.user.id})`);
-        await db.bquery(`UPDATE books SET votes = votes+1 WHERE id = ${req.params.bookID}`);
-        res.json({success: true, message: 'Thanks for upvoting this book'})
+        let status = await db.bquery(`CALL voteBook(${bookID}, ${req.user.id})`);
+        status = status[0][0];
+        res.json({success: status.code == 0 ? true : false, message: status.message})
     }catch(err){
-        if(err.errno == 1062) res.json({success: false, message: 'Already upvoted this book'});
-        else
-            res.json({success: false, message: err.sqlMessage});
+        if(err.errno){
+            writeLog(err);
+            msg.display(res, 500, msg.msg500, null);
+        }else{
+            msg.display(res, 403, msg.msg403+err, null);
+        }
     }
 })
 
 router.get('/comments/:bookID', async (req, res)=>{
     let id = parseInt(req.params.bookID);
+    if(Number.isNaN(id)){return msg.display(res, 403, msg.msg403+req.params.bookID, null);}
     try{
-        if(Number.isNaN(id)){throw req.params.bookID;}
-        let comments = await db.uquery(`SELECT * FROM (SELECT * FROM comments WHERE bookID=${id}) c INNER JOIN (SELECT id, name FROM users) u ON c.userID=u.id`);
+        let comments = await db.uquery(`SELECT * FROM (SELECT * FROM comments WHERE bookID=${id}) c INNER JOIN (SELECT id, name FROM users) u ON c.userID=u.id LIMIT 25`);
         res.json({success: true, comments: comments});
     }catch(err){
-        console.error(err);
+        writeLog(err);
         res.json({success: false});
     }
 })
@@ -88,16 +87,12 @@ router.get('/comments/:bookID', async (req, res)=>{
 router.post('/comments/:bookID', async (req, res)=>{
     if(!req.isAuthenticated()){return res.json({success: false, message: 'Login to post comments'})}
     try{
-        let comment = {
-            bookID: req.params.bookID,
-            userID: req.user.id,
-            cmnt: req.body.comment
-        }
-        await db.uquery('INSERT INTO comments SET ?', comment);
-        res.json({success: true});
+        let status = await db.uquery('CALL insertComment(?,?,?)', [req.params.bookID, req.user.id, req.body.comment]);
+        status = status[0][0];
+        res.json({success: status.code == 0 ? true : false, message: status.message});
     }catch(err){
-        console.error(err);
-        res.json({success: false, message: 'error occured'});
+        writeLog(err);
+        res.json({success: false, message: msg.msg500});
     }
 })
 
@@ -105,7 +100,7 @@ router.get('/cats', async (req, res)=>{
     try{
         if(req.query.id){
             let id = parseInt(req.query.id);
-            if(Number.isNaN(id)){return msg.display(res, 400, req.query.id, null);}
+            if(Number.isNaN(id)){return msg.display(res, 400, msg.msg403+req.query.id, null);}
             let cat = db.cats.find(cat=>cat.id==id);
             if(!cat){return msg.display(res, 404, 'category not found', null);}
             let books = await db.bquery(`SELECT * FROM (SELECT id, title, coverType, coverImage, views, votes FROM books WHERE id IN (SELECT bookID FROM book_category WHERE catID=${id})) b
@@ -121,7 +116,8 @@ router.get('/cats', async (req, res)=>{
             res.render('books/categories', {cat: cat, books: books})  
         }else{res.render('books/categories');}
     }catch(err){
-        msg.display(res, 500, err.sqlMessage, null);
+        writeLog(err);
+        msg.display(res, 500, msg.msg500, null);
     }
 })
 
@@ -129,10 +125,11 @@ router.get('/new', ppconfig.checkAuthenticated, (req, res)=>{res.render('books/n
 
 router.post('/new', ppconfig.checkAuthenticated, async (req, res)=>{
     let insert_id = 0;
+    let new_auths = [];
     try{
         let presence = await db.bquery(`SELECT id FROM books WHERE id=${req.body.id}`);
         if(presence.length > 0){return msg.display(res, 403, `This <a href="/books/book/${presence[0].id}">book entry</a> has already exist`, null);}
-        let new_book = {
+        await db.uquery(`INSERT INTO ${req.user.role=='member'?'new_books':'csdl20211_books.books'} SET ?`, {
             isbn: req.body.id,
             title: req.body.title,
             bdesc: req.body.desc,
@@ -140,27 +137,46 @@ router.post('/new', ppconfig.checkAuthenticated, async (req, res)=>{
             coverType: req.body.imgType,
             coverImage: Buffer.from(req.body.imgContent, 'base64'),
             copies: req.body.copies,
+            price: req.body.price,
             userID: req.user.id
-        }
-        await db.uquery('INSERT INTO new_books SET ?', new_book);
-        insert_id = await db.uquery('SELECT LAST_INSERT_ID() as id');
+        });
+        insert_id = await db.uquery('SELECT @newInsertID as id');
         insert_id = insert_id[0].id;
         
         for(let i = 0;;i++){
             if(!req.body[`auth${i}`]) break;
-            await db.uquery('INSERT INTO new_publish (id, aname) VALUES (?, ?)', [insert_id, req.body[`auth${i}`]]);
+            if(req.user.role=='member'){
+                await db.uquery('INSERT INTO new_publish (id, aname) VALUES (?, ?)', [insert_id, req.body[`auth${i}`]]);
+            }else{
+                await db.bquery('INSERT INTO authors (aname) VALUES (?)', [req.body[`auth${i}`]]);
+                let new_auth_id = await db.bquery('SELECT @newAuthorID as id');
+                new_auth_id = new_auth_id[0].id;
+                new_auths.push(new_auth_id);
+                await db.bquery(`INSERT INTO publish (bookID, authorID) VALUES (${req.body.id}, ${new_auth_id})`);
+            }
         }
         
         for(let i = 0;;i++){
             if(!req.body[`cat${i}`]) break;
-            await db.uquery('INSERT INTO new_books_cat (id, catID) VALUES (?, ?)', [insert_id, req.body[`cat${i}`]]);
+            if(req.user.role=='member'){
+                await db.uquery('INSERT INTO new_books_cat (id, catID) VALUES (?, ?)', [insert_id, req.body[`cat${i}`]]);
+            }else{
+                await db.bquery(`INSERT INTO book_category (bookID, catID) VALUES (${insert_id}, ${req.body[`cat${i}`]})`);
+            }
         }
         
         msg.display(res, 201, 'Thanks for your contribution', '/check.png');
     }catch(err){
-        await db.uquery(`DELETE FROM new_books WHERE id=${insert_id}`);
-        msg.display(res, 500, err.sqlMessage, null);
+        writeLog(err);
+        if(req.user.role == 'member'){
+            await db.uquery(`DELETE FROM new_books WHERE id=${insert_id}`);
+        }else{
+            await db.bquery(`DELETE FROM books WHERE id=${req.body.id}`);
+            await db.bquery(`DELETE FROM authors WHERE id IN (${new_auths})`);
+        }
+        msg.display(res, 500, msg.msg500, null);
     }
     
 })
+
 module.exports = router;

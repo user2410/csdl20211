@@ -1,16 +1,40 @@
 <h1>Login</h1>
 <% if (messages.error) { %>
   <%= messages.error %>
-<% } %>
-<form action="/login" method="POST">
-  <div class="mb-3">
+<%}%>
+<form action="/login" id="loginForm" method="POST">
+  <div>
     <label for="email" class="form-label">Email</label>
     <input type="email" id="email" class="form-control" name="email" required="">
   </div>
-  <div class="mb-3">
+  <div>
     <label for="pass" class="form-label">Password</label>
     <input type="password" id="pass" class="form-control" name="pass" required="">
   </div>
-  <button type="submit" class="btn btn-primary">Login</button>
+  <div>
+    <input type="checkbox" id="forget">
+    <label for="forget">Forgot password?</label>
+  </div>
+  <button type="submit" id="submit_btn" class="btn btn-primary">Login</button>
   <a href="/register">Register</a>
 </form>
+<script>
+  const form = document.getElementById('loginForm');
+  const submit_btn = document.getElementById('submit_btn');
+  const forgetCheckbox = document.getElementById('forget');
+  const pass = document.getElementById('pass');
+
+  submit_btn.addEventListener('click', function (event){
+    if(forgetCheckbox.checked){
+      event.preventDefault();
+      form.action = '/forget';
+      // form.method = 'POST';
+    }
+    form.submit();
+  });
+
+  forgetCheckbox.addEventListener('change', function(){
+    submit_btn.innerText = submit_btn.innerText=='Login' ? 'Next' : 'Login';
+    pass.disabled = !pass.disabled;
+  })
+</script>

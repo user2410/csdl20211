@@ -1,0 +1,82 @@
+<% let ids = [];%>
+<table class="table">
+    <thead>
+        <tr>
+            <td scope="col">Contributor</td>
+            <td scope="col">ISBN</td>
+            <td scope="col">Cover</td>
+            <td scope="col">Title</td>
+            <td scope="col">Author</td>
+            <td scope="col">Category</td>
+            <td scope="col">Publish Date</td>
+            <td scope="col">Price</td>
+            <td scope="col">Description</td>
+            <td scope="col">Accept/Decline</td>
+        </tr>
+    </thead>
+    <tbody>
+        <% books.forEach(book => { %>
+            <tr id="b<%-book.id%>">
+                <% ids.push(book.id) %>
+                <td scope="row"><%=book.uname%></td>
+                <td scope="row"><%-book.isbn%></td>
+                <td scope="row"><img src="<%-book.coverImage%>" height="150" width="100"></td>
+                <td scope="row"><%=book.title%></td>
+                <td scope="row"><%book.authors.forEach(author => {%>
+                    <%=author.aname%>,&nbsp;
+                <%})%></td>
+                <td scope="row"><% book.cats.forEach(cat => { %>
+                    <a href="/books/cat?id=<%-cat.catID%>"><%-cat.name%></a>,&nbsp;
+                <% }) %></td>
+                <td scope="row"><%-book.pbDate.toISOString().split('T')[0]%></td>
+                <td scope="row">$<%-book.price%></td>
+                <td scope="row">
+                    <button id="desc<%-book.id%>">Toggle description</button>
+                </td>
+                <td scope="row">
+                    <button id="acc-btn<%-book.id%>" class="btn btn-success" value="b<%-book.id%>">Accept</button>
+                    <button id="dec-btn<%-book.id%>" class="btn btn-danger" value="b<%-book.id%>">Decline</button>
+                </td>
+            </tr>
+            <tr id="d<%-book.id%>" hidden>
+                <td colspan="10"><p><%-book.bdesc%></p></td>
+            </tr>
+        <% })%>
+    </tbody>
+</table>
+
+<% ids = JSON.stringify(ids)%>
+
+<script>
+    var ids = JSON.parse(`<%-ids%>`);
+    ids.forEach(id => {
+        let acc_btn = document.getElementById(`acc-btn${id}`);
+        acc_btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open("PUT", `/staffs/accept/${acc_btn.value}`);
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(acc_btn.value).remove()}
+            }
+            req.send();
+        })
+
+        let dec_btn = document.getElementById(`dec-btn${id}`)
+        dec_btn.addEventListener('click', ()=>{
+            let req = new XMLHttpRequest();
+            req.open("DELETE", `/staffs/accept/${acc_btn.value}`);
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){document.getElementById(dec_btn.value).remove()}
+            }
+            req.send();
+        })
+
+        document.getElementById(`desc${id}`).addEventListener('click', ()=>{
+            let row = document.getElementById(`d${id}`);
+            row.hidden = !row.hidden;
+        })
+    })
+</script>

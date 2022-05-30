@@ -1,7 +1,7 @@
-<h2>Contribute a new book to my library</h2>
+<h2><%if(user.role=='member'){%>Contribute<%}else{%>Add<%}%> a new book to my library</h2>
 <form action="/books/new" method="POST">
-    <div class="d-flex justify-content-evenly flex-wrap">
-    <div class="mb-3" style="min-width: 45%;">
+    <div class="d-flex justify-content-between flex-wrap">
+    <div class="mb-3" style="min-width: 49%;">
         <label for="id" class="form-label">ISBN</label>
         <input type="number" class="form-control" name="id" required>
 
@@ -33,16 +33,19 @@
 
         <label for="copies" class="form-label">Copies</label>
         <input type="number" class="form-control" id="copies" name="copies" min="1" max="30">
+        
+        <label for="price" class="form-label">Price</label>
+        <input type="number" class="form-control" id="price" name="price" min="1.0" step=".01">
     </div>
-    <div class="mb-3">        
+    <div class="mb-3" style="min-width: 50%;">        
         <label for="desc" class="form-label">Description</label>
         <textarea name="desc" class="form-control" id="desc" cols="20" rows="5" placeholder="A short description of the new book (at most 5000 characters)"></textarea>
 
         <label for="uploaded_img" class="form-label">Book cover (file size &lt;= 1mb)</label>
-        <input type="file" id="uploaded_img" accept="image/png, image/jpeg" required>
-        <input type="hidden" name="imgType" id="imgType">
-        <input type="hidden" name="imgContent" id="imgContent">
         <div class="image-preview" id="imagePreview">
+            <input type="file" id="uploaded_img" accept="image/*" required>
+            <input type="hidden" name="imgType" id="imgType">
+            <input type="hidden" name="imgContent" id="imgContent">
             <img src="" alt="Image preview" class="image-preview__image">
             <span class="image-preview__default-text">Image preview</span>
         </div>
@@ -56,6 +59,11 @@
 <script src="/scripts/img_preview.js"></script>
 <script>
     // propagate new authors fields
+    init_image_preview(
+        document.getElementById('uploaded_img'), 
+        document.getElementById('imagePreview'), 
+        document.getElementById('imgContent'), 
+        document.getElementById('imgType'));
     let auth_count=1;
     document.getElementById('add_auth').addEventListener('click', ()=>{
         let input   = document.createElement('input');

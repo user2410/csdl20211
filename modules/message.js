@@ -7,4 +7,9 @@ function display(res, status, message, image){
     });
 }
 
+const msg500 = 'Internal server error';
+const msg403 = 'Forbidden';
+
 module.exports.display = display;
+module.exports.msg500 = msg500;
+module.exports.msg403 = msg403;

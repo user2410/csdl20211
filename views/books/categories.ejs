@@ -2,12 +2,17 @@
     <h2><%=cat.name%></h2>
     <%- include('book_list.ejs')%>
 <%}else{%>
+    <style>
+        a{
+            text-decoration: none;
+        }
+    </style>
     <div class="container d-flex flex-wrap">
     <%cats.forEach(cat=>{%>
         <a href="/books/cats?id=<%=cat.id%>">
         <div class="card">
             <div class="card-body">
-                <img src="/cats/<%-cat.id%>.png" alt="" height="20" width="20">
+                <img src="/cats/<%-cat.id%>.png" alt="" height="30" width="30">
                 <%=cat.name%>
             </div>
         </div>

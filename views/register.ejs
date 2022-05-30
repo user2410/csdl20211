@@ -1,16 +1,37 @@
 <h1>Register</h1>
 <form action="/register" method="POST">
-  <div class="mb-3">
+  <div class="d-flex justify-content-between flex-wrap">
+  <div class="mb-3" style="min-width: 49%;">
     <label for="name" class="form-label">Name</label>
     <input type="text" id="name" class="form-control" name="name" required>
-  </div>
-  <div class="mb-3">
+
     <label for="email" class="form-label">Email</label>
     <input type="email" id="email" class="form-control" name="email" required>
-  </div>
-  <div class="mb-3">
+
     <label for="pass" class="form-label">Password</label>
     <input type="password" id="pass" class="form-control" name="pass" required>
+
+    <label for="id" class="form-label">Identity number</label>
+    <input type="number" id="id" class="form-control" name="id" required>
+  </div>
+  <div class="mb-3" style="min-width: 50%;">
+    <label for="avatar" class="form-label">Profile image</label>
+    <div class="image-preview" id="imagePreview">
+      <input type="file" id="avatar" class="form-control" required>
+      <input type="hidden" name="imgType" id="imgType">
+      <input type="hidden" name="imgContent" id="imgContent">
+      <img src="" alt="Image preview" class="image-preview__image">
+      <span class="image-preview__default-text">Image preview</span>
+    </div>
+  </div>
   </div>
   <button type="submit" class="btn btn-primary">Register</button>
 </form>
+<script src="/scripts/img_preview.js"></script>
+<script>
+  init_image_preview(
+        document.getElementById('avatar'), 
+        document.getElementById('imagePreview'), 
+        document.getElementById('imgContent'), 
+        document.getElementById('imgType'));
+</script>

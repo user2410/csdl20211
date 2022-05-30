@@ -7,6 +7,7 @@
 
 <%if(!author.adesc || author.aImage == '/unknown_author.png'){let btn_class = 'disabled'; if(user){if(user.role == 'member'){btn_class = '';}}%>
 <button class="btn btn-primary <%-btn_class%>" type="button" data-bs-toggle="collapse" data-bs-target="#update_info" aria-expanded="false" aria-controls="update_info">Update this author's info</button>
+<%if(user){%>
 <div id="update_info" class="collapse" style="padding-top: 10px; padding-bottom: 10px">
     <form action="/authors/addinfo" method="POST">
         <input type="hidden" name="authorID" value="<%=author.id%>">
@@ -15,10 +16,10 @@
             <%if(author.aImage == '/unknown_author.png'){%>
             <div class="mb-3">
                 <label for="uploaded_img" class="form-label">Author's photo</label>
-                <input type="file" id="uploaded_img" accept="image/png, image/jpeg" required>
+                <input type="file" id="uploaded_img" accept="image/*" required>
                 <input type="hidden" name="imgType" id="imgType">
                 <input type="hidden" name="imgContent" id="imgContent">
-                <div class="image-preview" id="imagePreview">
+                <div class="image-preview" id="imagePreview" style="position: relative;left: 5%;">
                     <img src="" alt="Image preview" class="image-preview__image">
                     <span class="image-preview__default-text">Image preview</span>
                 </div>
@@ -35,7 +36,7 @@
         </div>
     </form>
 </div>
-<%}%>
+<%}}%>
 
 <div class="tabs" style="margin-top: 10px;">
     <div class="tabs__sidebar">
@@ -54,3 +55,10 @@
 
 <script src="/scripts/img_preview.js"></script>
 <script src="/scripts/tabs_switch.js"></script>
+<script>
+    init_image_preview(
+        document.getElementById('uploaded_img'), 
+        document.getElementById('imagePreview'), 
+        document.getElementById('imgContent'), 
+        document.getElementById('imgType'));
+</script>

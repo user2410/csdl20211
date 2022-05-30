@@ -17,8 +17,10 @@
     "express-ejs-layouts": "^2.5.1",
     "express-flash": "0.0.2",
     "express-session": "^1.17.2",
+    "googleapis": "^92.0.0",
     "method-override": "^3.0.0",
     "mysql": "^2.18.1",
+    "nodemailer": "^6.7.2",
     "passport": "^0.5.0",
     "passport-local": "^1.0.0"
   },

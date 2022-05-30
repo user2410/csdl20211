@@ -13,9 +13,9 @@
         <%books.forEach(book => {%>
             <tr id="b<%=book.bookID%>">
                 <%ids.push(book.bookID);%>
-                <td><a href="/books/book?id=<%-book.bookID%>"><%=book.title%></a></td>
+                <td><a href="/books/book/<%-book.bookID%>"><%=book.title%></a></td>
                 <td><%-book.loanDate.toISOString().split('T')[0]%></td>
-                <td><%-book.returnDate.toISOString().split('T')[0]%></td>
+                <td><%-book.expireDate.toISOString().split('T')[0]%></td>
                 <td><button id="<%-book.bookID%>">Return</button></td>
             </tr>
         <%})%>

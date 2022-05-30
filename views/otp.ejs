@@ -1,0 +1,6 @@
+<form action="/verify/<%-toDo%>" method="POST">
+    <input type="hidden" name="uID" value="<%-uID%>">
+    <label for="otp">Input code</label>
+    <input type="number" id="otp" name="otp" min="10000" max="99999">
+    <button type="submit">Submit</button>
+</form>

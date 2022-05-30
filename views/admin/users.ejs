@@ -1,0 +1,20 @@
+<table>
+    <thead class="table">
+        <tr>
+            <td scope="col">Name</td>
+            <td scope="col">Email</td>
+            <td scope="col">Role</td>
+            <td scope="col">Status</td>
+        </tr>
+    </thead>
+    <tbody>
+        <%locals.users.forEach(u=>{%>
+            <tr>
+                <td><a href="/users/user?id=<%-u.id%>"><%=u.name%></a></td>
+                <td><%=u.email%></td>
+                <td><%-u.role%></td>
+                <td><%-u.stat%></td>
+            </tr>
+        <%})%>
+    </tbody>
+</table>

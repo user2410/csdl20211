@@ -1,0 +1,213 @@
+<table class="table">
+    <thead>
+        <tr>
+            <td scope="col">Title</td>
+            <td scope="col">Borrower</td>
+            <td scope="col">Loan Date</td>
+            <td scope="col">Expiration Date</td>
+            <td scope="col">Return Date</td>
+            <td scope="col">Examine</td>
+        </tr>
+    </thead>
+    <tbody>
+        <%for(let i=0; i<returns.length; i++){%>
+        <tr id="<%-i%>">
+            <td scope="col"><a href="/books/book/<%-returns[i].bookID%>"><%=returns[i].title%></a></td>
+            <td scope="col"><%=returns[i].name%></td>
+            <td scope="col"><%=returns[i].loanDate.toISOString().split('T')[0]%></td>
+            <td scope="col"><%=returns[i].expireDate.toISOString().split('T')[0]%></td>
+            <td scope="col"><%=returns[i].returnDate.toISOString().split('T')[0]%></td>
+            <td scope="col"><button id="b<%-i%>">Examine</button></td>
+        </tr>
+        <%}%>
+    </tbody>
+</table>
+
+<%rets = JSON.stringify(returns);%>
+<script>
+    const returns = JSON.parse('<%-rets%>');
+    var entry_count = 0;
+    var late = 0;
+
+    function init_image_preview(inpFile, imgContent, imgType){
+        function imgReset(){
+            inpFile.value = "";
+            imgContent.value = '';
+            imgType.value = '';
+        }
+
+        inpFile.addEventListener("change", function(){
+            const file = this.files[0];
+            if(file){
+                if(file.size > 0x100000){return imgReset();}
+                const reader = new FileReader();
+                reader.addEventListener("load", function(){
+                    let data = this.result.split(';base64,');
+                    imgContent.value = data.pop();
+                    imgType.value = data.pop().slice(11);
+                })
+                reader.readAsDataURL(file);
+            } else {imgReset();}
+        });
+    }
+
+    function remAll(){
+        for(let i=0; i<parseInt('<%-returns.length%>'); i++){
+            let info = document.getElementById(`i${i}`);
+            if(info){info.remove(); break;}
+        }
+    }
+
+    function calculateFine(){
+        let total = 0.0;
+        for(let i=0; i<entry_count; i++){
+            total += parseFloat(document.getElementById(`fine${i}`).value);
+        }
+        return `${late*0.1+total}`;
+    }
+
+    function new_div(idx, retID){
+        let div = document.createElement('div');
+        div.style.maxWidth = '95%';
+        div.classList.add('row');
+        div.id = `c${idx}`;
+
+        let div1 = document.createElement('div');
+        div1.style.maxWidth = '49%';
+
+        let comment = document.createElement('textarea');
+        comment.name = `comment${idx}`;
+        comment.id = `comment${idx}`;
+        comment.cols = 45;
+        comment.rows = 4;
+        comment.maxLength = 200;
+        div1.appendChild(comment);
+        div.appendChild(div1);
+
+        let div2 = document.createElement('div');
+        div2.style.maxWidth = '50%';
+        div2.id = `imagePreview${idx}`;
+        let image = document.createElement('input');
+        image.type = 'file';
+        image.id = `uploaded_img${idx}`
+        image.accept = 'image/*';
+        div2.appendChild(image);
+
+        let imageContent = document.createElement('input');
+        imageContent.type = 'hidden';
+        imageContent.id = `imgContent${idx}`;
+        imageContent.name = `imgContent${idx}`;
+        div2.appendChild(imageContent);
+
+        let imageType = document.createElement('input');
+        imageType.type = 'hidden';
+        imageType.id = `imgType${idx}`;
+        imageType.name = `imgType${idx}`;
+        div2.appendChild(imageType);
+
+        init_image_preview(image, imageContent, imageType)
+
+        let fine = document.createElement('select');
+        fine.id = `fine${idx}`;
+        fine.name = `fine${idx}`;
+        [{type:'slight', val: returns[retID].price/8.0}, {type:'medium', val: returns[retID].price/4.0}, {type:'severe', val: returns[retID].price*0.75}].forEach(f=>{
+            var option = document.createElement('option');
+            option.value = f.val;
+            option.innerText = f.type;
+            fine.appendChild(option);
+        });
+        fine.addEventListener('change', ()=>{
+            document.getElementById('totalFine').innerText = calculateFine();
+        })
+        div2.appendChild(fine);
+
+        div.appendChild(div2);
+        return div;
+    }
+
+    function craftContent(idx){
+        let totalFine = document.getElementById('totalFine');
+        let content = `totalFine=${encodeURIComponent(parseFloat(totalFine.innerText))}&bookID=${returns[idx].bookID}&userID=${returns[idx].userID}`;
+        for(let i=0; i<entry_count; i++){
+            var fine = document.getElementById(`fine${i}`);
+            content += `&comment${i}=${encodeURIComponent(document.getElementById(`comment${i}`).value)}&imgContent${i}=${encodeURIComponent(document.getElementById(`imgContent${i}`).value)}&imgType${i}=${encodeURIComponent(document.getElementById(`imgType${i}`).value)}&severity${i}=${fine.options[fine.selectedIndex].text}`;
+        }
+        return content;
+    }
+
+    function craftInfo(idx, exam_btn){
+        let info = document.createElement('td');
+        info.colSpan = 6;
+
+        let intro = document.createElement('div');
+        intro.innerText = 'Book return examination report';
+        info.appendChild(intro);
+
+        let form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/staffs/return';
+        info.appendChild(form);
+
+        let table = document.createElement('div');
+        table.classList.add('container');
+        table.appendChild(new_div(entry_count++, idx));
+        form.appendChild(table);
+
+        let total = document.createElement('div');
+        total.innerText = 'Total fine = $';
+        let totalFine = document.createElement('span');
+        totalFine.id = 'totalFine';
+        late = parseInt((new Date(returns[idx].returnDate)-new Date(returns[idx].expireDate))/(24*60*60*1000));
+        totalFine.innerText = `${late > 0 ? late*0.1 : 0}`;
+        total.appendChild(totalFine);
+        form.appendChild(total);
+
+        let add_btn = document.createElement('button'); add_btn.innerText = 'Add';
+        let rem_btn = document.createElement('button'); rem_btn.innerText = 'Remove';
+        let submit_btn = document.createElement('button'); submit_btn.innerText = 'Submit';
+        
+        add_btn.addEventListener('click', ()=>table.appendChild(new_div(entry_count++, idx)));
+        add_btn.type = 'button';
+        form.appendChild(add_btn);
+        rem_btn.addEventListener('click', ()=>{
+            if(entry_count>1){
+                let rem_entry = document.getElementById(`c${--entry_count}`);
+                rem_entry.remove();
+            }
+            document.getElementById('totalFine').innerText = calculateFine();
+        })
+        rem_btn.type = 'button';
+        form.appendChild(rem_btn);
+        submit_btn.addEventListener('click', (event)=>{
+            event.preventDefault();
+            let req = new XMLHttpRequest();
+            req.open('POST', '/staffs/return');
+            req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            req.onload = function(){
+                let response = JSON.parse(req.responseText);
+                alert(response.message);
+                if(response.success == true){
+                    exam_btn.disabled = true;
+                    info.remove();
+                }
+            }
+            req.send(craftContent(idx));
+        })
+        submit_btn.type = 'submit';
+        form.appendChild(submit_btn);
+        
+        return info;
+    }
+
+    let tbody = document.getElementsByTagName('tbody')[0];
+    for(let i=0; i<parseInt('<%-returns.length%>'); i++){
+        let btn = document.getElementById(`b${i}`);
+        btn.addEventListener('click', ()=>{
+            remAll();
+            let new_row = tbody.insertRow(i+1);
+            new_row.id = `i${i}`;
+            entry_count = 0;
+            new_row.appendChild(craftInfo(i, btn));
+        })
+    }
+</script>

@@ -3,20 +3,20 @@
     <table class="table">
         <thead>
             <tr>
-                <td>Cover</td>
-                <td>Title</td>
-                <td>Author</td>
-                <td>Category</td>
-                <td>Views</td>
-                <td>Votes</td>
+                <td scope="col">Cover</td>
+                <td scope="col">Title</td>
+                <td scope="col">Author</td>
+                <td scope="col">Category</td>
+                <td scope="col">Views</td>
+                <td scope="col">Votes</td>
             </tr>
         </thead>
         <tbody>
             <% books.forEach(book => { %>
                 <tr>
-                    <td><img src="<%=book.coverImage%>" alt="book.title" height="150" width="100"></td>
-                    <td><a href="/books/book?id=<%=book.bookID||book.id%>"><%=book.title%></a></td>
-                    <td><a href="/authors/author?id=<%=book.authorID%>"><%=book.aname%></a></td>
+                    <td scope="row"><img src="<%=book.coverImage%>" alt="book.title" height="150" width="100"></td>
+                    <td><a href="/books/book/<%=book.bookID||book.id%>"><%=book.title%></a></td>
+                    <td><a href="/authors/author/<%=book.authorID%>"><%=book.aname%></a></td>
                     <td><a href="/books/cats?id=<%=book.catID%>"><%=book.catname%></a></td>
                     <td><%=book.views%></td>
                     <td><%=book.votes%></td>

@@ -1,0 +1,47 @@
+<% var count = 0; if(notifications instanceof Array){notifications.forEach(n => count+=n.length);}%>
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Notifications(<%-count%>)
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <%if(!notifications instanceof Array){%><li><%-notifications%></li>
+        <%}else{ if(notifications[0].length>0){%>
+        <li><strong>Book returns overdue</strong></li>
+        <ul>
+        <%notifications[0].forEach(ret=>{%>
+            <%if(ret.remain>0){%>
+                <li style="background: yellow"><a class="dropdown-item" href="/users/borrow"><strong><%=ret.title%></strong></a></li>
+            <%}else{%>
+                <li style="background: red"><a class="dropdown-item" href="/users/borrow"><strong><%=ret.title%></strong></a></li>
+        <%}})%>
+        </ul>
+        <%}if(notifications[1].length>0){%>
+        <li><strong>Book returns reports</strong></li>
+        <ul>
+        <%notifications[1].forEach(r=>{%>
+            <li style="background: green"><a class="dropdown-item" href="/users/report?b=<%-r.bookID%>"><%=r.title%></a></li>
+        <%})%>
+        </ul>
+        <%}if(notifications[2].length>0){%>
+        <li><strong>New book requests</strong></li>
+        <ul>
+        <%notifications[2].forEach(b=>{%>
+            <%if(b.stat=='acc'){%>
+            <li style="background: green"><a class="dropdown-item" href="/books/book/<%-b.isbn%>"><%=b.title%> accepted</a></li>
+            <%}else{%>
+            <li style="background: red"><a class="dropdown-item" href="#"><%=b.title%> declined</a></li>
+        <%}})%>
+        </ul>
+        <%}if(notifications[3].length>0){%>
+        <li><strong>Authors' info requests</strong></li>
+        <ul>
+        <%notifications[3].forEach(a=>{%>
+            <%if(a.stat=='acc'){%>
+            <li style="background: green"><a class="dropdown-item" href="/authors/author/<%-a.authorID%>"><%-a.aname%> accepted</a></li>
+            <%}else{%>
+            <li style="background: red"><a class="dropdown-item" href="/authors/author/<%-a.authorID%>"><%-a.aname%> declined</a></li>
+        <%}})%>
+        </ul>
+    </ul>
+</li>
+<%}}%>

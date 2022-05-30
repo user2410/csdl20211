@@ -1,0 +1,33 @@
+
+<img src="<%-book.coverImage%>" alt="" width="200" height="300">
+<h2><a href="/books/book/<%-report[0].bookID%>"><%=book.title%></a></h2>
+<h3>Loan date: <%-report[0].loanDate.toISOString().split('T')[0]%></h3>
+<h3>Expiration date: <%-report[0].expireDate.toISOString().split('T')[0]%></h3>
+<h3>Return date: <%-report[0].returnDate.toISOString().split('T')[0]%></h3>
+<h3>Total fine: $<span id="totalFine"></span></h3>
+
+<%}if(report.length>0){const damage = {'slight': 1/8.0, 'medium': 1/4.0, 'severe': 0.75}; var totalFine = 0.0;%>
+    <table class="table">
+        <thead>
+            <tr>
+                <td scope="col">Comment</td>
+                <td scope="col">Image</td>
+                <td scope="col">Severity</td>
+            </tr>
+        </thead>
+        <tbody>
+            <%report.forEach(r=>{%>
+            <tr>
+                <td scope="row"><%=r.remark%></td>
+                <td scope="row"><img src="<%-r.image%>" style="max-height: 300px;"></td>
+                <td scope="row">r.severity(<%-book.price*damage[r.severity]%>)</td>
+                <%totalFine += book.price*damage[r.severity];%>
+            </tr>
+            <%})%>
+        </tbody>
+    </table>
+<%}%>
+
+<script>
+    document.getElementById('totalFine').innerText = '<%-totalFine%>';
+</script>
